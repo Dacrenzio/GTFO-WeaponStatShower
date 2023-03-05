@@ -34,25 +34,59 @@ namespace WeaponStatShower
 
         public static void CM_InventorySlotItem__LoadData__Postfix(CM_InventorySlotItem __instance, GearIDRange idRange, bool clickable, bool detailedInfo)
         {
-            WeaponStatShowerPlugin.LogDebug("entered the CM_InventorySlotItem method");
-
             uint categoryID = idRange.GetCompID(eGearComponent.Category);
-
-            _playerDataBlock = PlayerDataBlock.GetBlock(1U);
 
             GearCategoryDataBlock gearCatBlock = GameDataBlockBase<GearCategoryDataBlock>.GetBlock(categoryID);
 
             ItemDataBlock itemDataBlock = ItemDataBlock.GetBlock(gearCatBlock.BaseItem);
 
-            R6PlusOnly(__instance, gearCatBlock, itemDataBlock);
+            _playerDataBlock = PlayerDataBlock.GetBlock(1U);
+
+            if (itemDataBlock.inventorySlot == InventorySlot.GearMelee)
+            {
+                PopulateMelee(__instance, gearCatBlock, itemDataBlock);
+            }
+            else
+            {
+                eWeaponFireMode weaponFireMode = (eWeaponFireMode)idRange.GetCompID(eGearComponent.FireMode);
+
+                bool isSentryGun = categoryID == 12; // => PersistentID of the Sentry Gun Category
+
+                ArchetypeDataBlock archetypeDataBlock = isSentryGun
+                    ? SentryGunInstance_Firing_Bullets.GetArchetypeDataForFireMode(weaponFireMode)
+                    : ArchetypeDataBlock.GetBlock(GearBuilder.GetArchetypeID(gearCatBlock, weaponFireMode));
+
+                __instance.GearDescription = ChargeUpFormat(__instance, archetypeDataBlock);
+
+                __instance.GearDescription += "\n\n" + GetFormatedWeaponStats(archetypeDataBlock, itemDataBlock, isSentryGun);
+            }
         }
 
-        private static void R6PlusOnly(CM_InventorySlotItem __instance, GearCategoryDataBlock gearCatBlock, ItemDataBlock itemDataBlock)
+        private static String ChargeUpFormat(CM_InventorySlotItem __instance, ArchetypeDataBlock archetypeDataBlock)
+        {
+            if (archetypeDataBlock.SpecialChargetupTime > 0)
+            {
+                String chargeString = archetypeDataBlock.SpecialChargetupTime > 0.3 ? "Long Charge-Up" : "Short Charge-Up";
+
+                String[] lines = __instance.GearDescription.Split("\n");
+                foreach (String line in lines)
+                {
+                    if (line.Contains("CHARGE"))
+                    {
+                        return __instance.GearDescription.Replace(line, chargeString);
+                    }
+                }
+
+                return __instance.GearDescription += "\n" + chargeString;
+            }
+            return __instance.GearDescription;
+        }
+
+        private static void PopulateMelee(CM_InventorySlotItem __instance, GearCategoryDataBlock gearCatBlock, ItemDataBlock itemDataBlock)
         {
             MeleeArchetypeDataBlock meleeArchetypeDataBlock = MeleeArchetypeDataBlock.GetBlock(GearBuilder.GetMeleeArchetypeID(gearCatBlock));
 
             __instance.GearDescription = __instance.GearDescription + "\n\n" + GetFormatedWeaponStats(meleeArchetypeDataBlock, itemDataBlock);
-            WeaponStatShowerPlugin.LogDebug(__instance.GearDescription);
         }
 
 
@@ -196,6 +230,8 @@ namespace WeaponStatShower
 
             StringBuilder builder = new StringBuilder();
 
+
+
             builder.Append("<#9D2929>");
             builder.Append($"{Short_Damage} ");
             builder.Append(archeTypeDataBlock.Damage);
@@ -297,6 +333,16 @@ namespace WeaponStatShower
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
+            if (archeTypeDataBlock.SpecialChargetupTime > 0)
+            {
+                builder.Append(DIVIDER);
+
+                builder.Append("<#AAA8FF>");
+                builder.Append($"{Short_ChargeUp} ");
+                builder.Append(archeTypeDataBlock.SpecialChargetupTime);
+                builder.Append(CLOSE_COLOR_TAG);
+            }
+
             return builder.ToString();
         }
 
@@ -365,5 +411,6 @@ namespace WeaponStatShower
         public static string Short_ShotgunSpread { get; } = "Sh.Sprd";
         public static string Short_BurstShotCount { get; } = "Brst.Sht";
         public static string Short_BurstDelay { get; } = "Brst.Dly";
+        public static string Short_ChargeUp { get; } = "Chrg";
     }
 }
