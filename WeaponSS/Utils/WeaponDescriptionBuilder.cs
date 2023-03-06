@@ -48,30 +48,70 @@ namespace WeaponStatShower.Utils
                     ? SentryGunInstance_Firing_Bullets.GetArchetypeDataForFireMode(weaponFireMode)
                     : ArchetypeDataBlock.GetBlock(GearBuilder.GetArchetypeID(gearCatBlock, weaponFireMode));
 
-                GearDescription = VerboseDescriptionFormatter(GearDescription, archetypeDataBlock);
+                GearDescription = VerboseDescriptionFormatter(archetypeDataBlock, isSentryGun);
 
                 return GearDescription + "\n\n" + GetFormatedWeaponStats(archetypeDataBlock, itemDataBlock, isSentryGun);
             }
         }
 
-        private string VerboseDescriptionFormatter(string GearDescription, ArchetypeDataBlock archetypeDataBlock)
+        private string VerboseDescriptionFormatter(ArchetypeDataBlock archetypeDataBlock, bool isSentryGun)
         {//TODO: aggiungere solo descrizioni utili
-            if (archetypeDataBlock.SpecialChargetupTime > 0)
+            StringBuilder sb = new StringBuilder();
+
+            if (isSentryGun)
+                sb.AppendLine("Deployable");
+            
+            switch (archetypeDataBlock.FireMode)
             {
-                string chargeString = archetypeDataBlock.SpecialChargetupTime > 0.4 ? "Long Charge-Up" : "Short Charge-Up";
-
-                string[] lines = GearDescription.Split("\n");
-                foreach (string line in lines)
-                {
-                    if (line.ToUpper().Contains("CHARGE"))
-                    {
-                        return GearDescription.Replace(line, chargeString);
-                    }
-                }
-
-                return GearDescription += "\n" + chargeString;
+                case eWeaponFireMode.Auto:
+                case eWeaponFireMode.SentryGunAuto:
+                    sb.AppendLine("Fully Automatic");
+                    break;
+                case eWeaponFireMode.Semi:
+                case eWeaponFireMode.SentryGunSemi:
+                    sb.AppendLine("Semi Automatic");
+                    break;
+                case eWeaponFireMode.Burst:
+                case eWeaponFireMode.SentryGunBurst:
+                    sb.AppendLine("Burst FireMode");
+                    break;
+                case eWeaponFireMode.SemiBurst:
+                    sb.AppendLine("SemiBurst FireMode");
+                    break;
+                case eWeaponFireMode.SentryGunShotgunSemi:
+                    sb.AppendLine("Shotgun FireMode");
+                    break;
+                default:
+                    WeaponStatShowerPlugin.LogError("FireMode not found");
+                    break;
             }
-            return GearDescription;
+
+            switch (archetypeDataBlock.RecoilDataID)
+            {
+                case 0U:
+                    sb.AppendLine("Low Recoil");
+                    break;
+                case 1U:
+                    sb.AppendLine("Balanced Recoil");
+                    break;
+                case 2U:
+                    sb.AppendLine("High Recoil");
+                    break;
+                case 3U:
+                    sb.AppendLine("Very-High Recoil");
+                    break;
+                case 4U:
+                    sb.AppendLine("4U Recoil");
+                    break;
+                default:
+                    WeaponStatShowerPlugin.LogError("Recoil not considered");
+                    break;
+            }
+
+            if (archetypeDataBlock.SpecialChargetupTime > 0)
+                sb.AppendLine(archetypeDataBlock.SpecialChargetupTime > 0.4 ? "Long Charge-up": "Short Charge-up") ;
+            
+            return sb.ToString();
         }
 
         private string GetFormatedWeaponStats(ArchetypeDataBlock archeTypeDataBlock, ItemDataBlock itemDataBlock, bool isSentryGun = false)
@@ -104,6 +144,9 @@ namespace WeaponStatShower.Utils
             builder.Append(GetTotalAmmo(archeTypeDataBlock, itemDataBlock, isSentryGun));
             builder.Append(CLOSE_COLOR_TAG);
 
+            builder.Append("\n");
+
+
             if (archeTypeDataBlock.PrecisionDamageMulti != 1f)
             {
                 builder.Append(DIVIDER);
@@ -118,7 +161,7 @@ namespace WeaponStatShower.Utils
 
             builder.Append("<#AAA8FF>");
             builder.Append($"{Short_Falloff} ");
-            builder.Append(archeTypeDataBlock.DamageFalloff);
+            builder.Append((int)archeTypeDataBlock.DamageFalloff.x);
             builder.Append(CLOSE_COLOR_TAG);
 
             if (!isSentryGun)
@@ -130,6 +173,8 @@ namespace WeaponStatShower.Utils
                 builder.Append(FormatFloat(archeTypeDataBlock.DefaultReloadTime));
                 builder.Append(CLOSE_COLOR_TAG);
             }
+
+            builder.Append("\n");
 
             bool nonStandardStagger = archeTypeDataBlock.StaggerDamageMulti != 1f;
 
@@ -357,6 +402,31 @@ namespace WeaponStatShower.Utils
             return -1;
         }
 
+
+        private int GetTotalAmmo(ArchetypeDataBlock archetypeDataBlock, ItemDataBlock itemDataBlock, bool isSentryGun = false)
+        {
+            var max = GetAmmoMax(itemDataBlock);
+
+            var costOfBullet = archetypeDataBlock.CostOfBullet;
+
+            if (isSentryGun)
+            {
+                costOfBullet = costOfBullet * itemDataBlock.ClassAmmoCostFactor;
+
+                if (archetypeDataBlock.ShotgunBulletCount > 0f)
+                {
+                    costOfBullet *= archetypeDataBlock.ShotgunBulletCount;
+                }
+            }
+
+            var maxBullets = (int)(max / costOfBullet);
+
+            if (isSentryGun)
+                return maxBullets;
+
+            return maxBullets + archetypeDataBlock.DefaultClipSize;
+        }
+
         private string GetKillList(ArchetypeDataBlock archetypeDataBlock, bool isShotgun)
         {
             StringBuilder builder = new StringBuilder();
@@ -393,31 +463,6 @@ namespace WeaponStatShower.Utils
 
             return builder.ToString();
         }
-
-        private int GetTotalAmmo(ArchetypeDataBlock archetypeDataBlock, ItemDataBlock itemDataBlock, bool isSentryGun = false)
-        {
-            var max = GetAmmoMax(itemDataBlock);
-
-            var costOfBullet = archetypeDataBlock.CostOfBullet;
-
-            if (isSentryGun)
-            {
-                costOfBullet = costOfBullet * itemDataBlock.ClassAmmoCostFactor;
-
-                if (archetypeDataBlock.ShotgunBulletCount > 0f)
-                {
-                    costOfBullet *= archetypeDataBlock.ShotgunBulletCount;
-                }
-            }
-
-            var maxBullets = (int)(max / costOfBullet);
-
-            if (isSentryGun)
-                return maxBullets;
-
-            return maxBullets + archetypeDataBlock.DefaultClipSize;
-        }
-
 
         public const string DIVIDER = " | ";
         public const string CLOSE_COLOR_TAG = "</color>";
