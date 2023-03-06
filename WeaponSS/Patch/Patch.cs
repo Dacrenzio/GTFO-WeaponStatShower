@@ -3,7 +3,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 
 
-namespace WeaponStatShower
+namespace WeaponStatShower.Patch
 {
 #pragma warning disable CS8600
 #pragma warning disable CS8618
@@ -25,7 +25,7 @@ namespace WeaponStatShower
             string? prefixMethodName = default,
             string? postfixMethodName = default)
             where TClass : class =>
-            this.PatchConstructor<TClass>(null, patchType, prefixMethodName, postfixMethodName);
+            PatchConstructor<TClass>(null, patchType, prefixMethodName, postfixMethodName);
 
         public void PatchConstructor<TClass>(
             Type[]? parameters,
@@ -35,7 +35,7 @@ namespace WeaponStatShower
             where TClass : class
         {
             var m = AccessTools.Constructor(typeof(TClass), parameters);
-            this.PatchMethod<TClass>(m, patchType, prefixMethodName, postfixMethodName);
+            PatchMethod<TClass>(m, patchType, prefixMethodName, postfixMethodName);
         }
 
         #region Generic PatchMethod overloads
@@ -46,7 +46,7 @@ namespace WeaponStatShower
             string prefixMethodName = default,
             string postfixMethodName = default)
             where TClass : class =>
-            this.PatchMethod<TClass>(methodName, null, patchType, generics, prefixMethodName, postfixMethodName);
+            PatchMethod<TClass>(methodName, null, patchType, generics, prefixMethodName, postfixMethodName);
 
         public void PatchMethod<TClass>(
             string methodName,
@@ -58,7 +58,7 @@ namespace WeaponStatShower
             where TClass : class
         {
             var m = AccessTools.Method(typeof(TClass), methodName, parameters, generics);
-            this.PatchMethod<TClass>(m, patchType, prefixMethodName, postfixMethodName);
+            PatchMethod<TClass>(m, patchType, prefixMethodName, postfixMethodName);
         }
 
         public void PatchMethod<TClass>(
@@ -67,7 +67,7 @@ namespace WeaponStatShower
             string prefixMethodName = default,
             string postfixMethodName = default)
             where TClass : class =>
-            this.PatchMethod(typeof(TClass), methodBase, patchType, prefixMethodName, postfixMethodName);
+            PatchMethod(typeof(TClass), methodBase, patchType, prefixMethodName, postfixMethodName);
         #endregion
 
         #region Non-generic PatchMethod overloads
@@ -78,7 +78,7 @@ namespace WeaponStatShower
             Type[] generics = null,
             string prefixMethodName = default,
             string postfixMethodName = default) =>
-            this.PatchMethod(classType, methodName, null, patchType, generics, prefixMethodName, postfixMethodName);
+            PatchMethod(classType, methodName, null, patchType, generics, prefixMethodName, postfixMethodName);
 
         public void PatchMethod(
             Type classType,
@@ -90,7 +90,7 @@ namespace WeaponStatShower
             string postfixMethodName = default)
         {
             var m = AccessTools.Method(classType, methodName, parameters, generics);
-            this.PatchMethod(classType, m, patchType, prefixMethodName, postfixMethodName);
+            PatchMethod(classType, m, patchType, prefixMethodName, postfixMethodName);
         }
         #endregion
 
@@ -115,11 +115,11 @@ namespace WeaponStatShower
             {
                 try
                 {
-                    prefix = AccessTools.Method(this.GetType(), prefixMethodName ?? $"{className}__{methodName}__Prefix");
+                    prefix = AccessTools.Method(GetType(), prefixMethodName ?? $"{className}__{methodName}__Prefix");
                 }
                 catch (Exception ex)
                 {
-                    this.LogFatal($"Failed to obtain the prefix patch method for {formattedMethodName}): {ex}");
+                    LogFatal($"Failed to obtain the prefix patch method for {formattedMethodName}): {ex}");
                 }
             }
 
@@ -127,11 +127,11 @@ namespace WeaponStatShower
             {
                 try
                 {
-                    postfix = AccessTools.Method(this.GetType(), postfixMethodName ?? $"{className}__{methodName}__Postfix");
+                    postfix = AccessTools.Method(GetType(), postfixMethodName ?? $"{className}__{methodName}__Postfix");
                 }
                 catch (Exception ex)
                 {
-                    this.LogFatal($"Failed to obtain the postfix patch method for {formattedMethodName}): {ex}");
+                    LogFatal($"Failed to obtain the postfix patch method for {formattedMethodName}): {ex}");
                 }
             }
 
@@ -139,47 +139,47 @@ namespace WeaponStatShower
             {
                 if (prefix != null && postfix != null)
                 {
-                    this.Harmony.Patch(methodBase, prefix: new HarmonyMethod(prefix), postfix: new HarmonyMethod(postfix));
+                    Harmony.Patch(methodBase, prefix: new HarmonyMethod(prefix), postfix: new HarmonyMethod(postfix));
                     return;
                 }
 
                 if (prefix != null)
                 {
-                    this.Harmony.Patch(methodBase, prefix: new HarmonyMethod(prefix));
+                    Harmony.Patch(methodBase, prefix: new HarmonyMethod(prefix));
                     return;
                 }
 
                 if (postfix != null)
                 {
-                    this.Harmony.Patch(methodBase, postfix: new HarmonyMethod(postfix));
+                    Harmony.Patch(methodBase, postfix: new HarmonyMethod(postfix));
                     return;
                 }
             }
             catch (Exception ex)
             {
-                this.LogError($"Failed to patch method {formattedMethodName}: {ex}");
+                LogError($"Failed to patch method {formattedMethodName}: {ex}");
             }
         }
 
         public void Log(LogLevel level, object data) =>
-            WeaponStatShowerPlugin.Instance.Log.Log(level, $"<{this.Name}> {data}");
+            WeaponStatShowerPlugin.Instance.Log.Log(level, $"<{Name}> {data}");
 
         public void LogDebug(object data) =>
-            WeaponStatShowerPlugin.Instance.Log.LogDebug($"<{this.Name}> {data}");
+            WeaponStatShowerPlugin.Instance.Log.LogDebug($"<{Name}> {data}");
 
         public void LogError(object data) =>
-            WeaponStatShowerPlugin.Instance.Log.LogError($"<{this.Name}> {data}");
+            WeaponStatShowerPlugin.Instance.Log.LogError($"<{Name}> {data}");
 
         public void LogFatal(object data) =>
-            WeaponStatShowerPlugin.Instance.Log.LogFatal($"<{this.Name}> {data}");
+            WeaponStatShowerPlugin.Instance.Log.LogFatal($"<{Name}> {data}");
 
         public void LogInfo(object data) =>
-            WeaponStatShowerPlugin.Instance.Log.LogInfo($"<{this.Name}> {data}");
+            WeaponStatShowerPlugin.Instance.Log.LogInfo($"<{Name}> {data}");
 
         public void LogMessage(object data) =>
-            WeaponStatShowerPlugin.Instance.Log.LogMessage($"<{this.Name}> {data}");
+            WeaponStatShowerPlugin.Instance.Log.LogMessage($"<{Name}> {data}");
 
         public void LogWarning(object data) =>
-            WeaponStatShowerPlugin.Instance.Log.LogWarning($"<{this.Name}> {data}");
+            WeaponStatShowerPlugin.Instance.Log.LogWarning($"<{Name}> {data}");
     }
 }

@@ -2,6 +2,7 @@
 using HarmonyLib;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
+using WeaponStatShower.Patch;
 
 namespace WeaponStatShower
 {

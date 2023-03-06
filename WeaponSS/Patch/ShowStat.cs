@@ -6,7 +6,7 @@ using Player;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace WeaponStatShower
+namespace WeaponStatShower.Patch
 {
     internal class ShowStat : Patch
     {
@@ -34,7 +34,7 @@ namespace WeaponStatShower
         public override void Execute()
         {
             WeaponStatShowerPlugin.LogInfo("Before getting the Execution");
-            this.PatchMethod<CM_InventorySlotItem>(nameof(CM_InventorySlotItem.LoadData), PatchType.Postfix);
+            PatchMethod<CM_InventorySlotItem>(nameof(CM_InventorySlotItem.LoadData), PatchType.Postfix);
         }
 
 
@@ -70,14 +70,14 @@ namespace WeaponStatShower
             }
         }
 
-        private static String ChargeUpFormat(CM_InventorySlotItem __instance, ArchetypeDataBlock archetypeDataBlock)
+        private static string ChargeUpFormat(CM_InventorySlotItem __instance, ArchetypeDataBlock archetypeDataBlock)
         {
             if (archetypeDataBlock.SpecialChargetupTime > 0)
             {
-                String chargeString = archetypeDataBlock.SpecialChargetupTime > 0.3 ? "Long Charge-Up" : "Short Charge-Up";
+                string chargeString = archetypeDataBlock.SpecialChargetupTime > 0.3 ? "Long Charge-Up" : "Short Charge-Up";
 
-                String[] lines = __instance.GearDescription.Split("\n");
-                foreach (String line in lines)
+                string[] lines = __instance.GearDescription.Split("\n");
+                foreach (string line in lines)
                 {
                     if (line.ToUpper().Contains("CHARGE"))
                     {
@@ -318,7 +318,7 @@ namespace WeaponStatShower
 
             if (isShotgun)
             {
-                
+
                 builder.Append(DIVIDER);
 
                 builder.Append("<#55022B>");
@@ -385,19 +385,19 @@ namespace WeaponStatShower
         public static string GetKillList(ArchetypeDataBlock archetypeDataBlock, bool isShotgun)
         {
             StringBuilder builder = new StringBuilder();
-            float damage = isShotgun ? archetypeDataBlock.Damage*archetypeDataBlock.ShotgunBulletCount : archetypeDataBlock.Damage;
+            float damage = isShotgun ? archetypeDataBlock.Damage * archetypeDataBlock.ShotgunBulletCount : archetypeDataBlock.Damage;
 
-            foreach(string enemyName in EnemyDatas.Keys)
+            foreach (string enemyName in EnemyDatas.Keys)
             {
                 List<char> killPlace = new List<char>();
                 float[] currEnemyDatas = EnemyDatas[enemyName];
                 if (damage * currEnemyDatas[1] * currEnemyDatas[2] * archetypeDataBlock.PrecisionDamageMulti >= currEnemyDatas[0])
                 {
                     killPlace.Add('o');
-                    if(damage * currEnemyDatas[1] >= currEnemyDatas[0])
+                    if (damage * currEnemyDatas[1] >= currEnemyDatas[0])
                     {
                         killPlace.Add('h');
-                        if(damage * currEnemyDatas[2] >= currEnemyDatas[0])
+                        if (damage * currEnemyDatas[2] >= currEnemyDatas[0])
                         {
                             killPlace.Add('b');
                             if (damage > currEnemyDatas[0])
@@ -408,14 +408,14 @@ namespace WeaponStatShower
                     }
                 }
 
-                if(killPlace.Count > 0)
+                if (killPlace.Count > 0)
                 {
                     killPlace.Reverse();
-                    builder.Append(enemyName+": [" + string.Join(",",killPlace.ToArray()) + "]\n");
-                   
+                    builder.Append(enemyName + ": [" + string.Join(",", killPlace.ToArray()) + "]\n");
+
                 }
             }
-            
+
             return builder.ToString();
         }
 
