@@ -2,7 +2,7 @@
 using HarmonyLib;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
-using WeaponStatShower.Patch;
+using WeaponStatShower.Patches;
 
 namespace WeaponStatShower
 {
@@ -20,7 +20,7 @@ namespace WeaponStatShower
         private static readonly ConfigDefinition ConfigGameVersion = new(SectionMain, "GameVersion");
 
         private static Harmony HarmonyInstance;
-        private static readonly Dictionary<Type, Patch> RegisteredPatches = new();
+        private static readonly Dictionary<Type, Patches.Patch> RegisteredPatches = new();
 
         public static WeaponStatShowerPlugin Instance { get; private set; }
 
@@ -41,7 +41,7 @@ namespace WeaponStatShower
             this.Config.Save();
         }
 
-        public static void RegisterPatch<T>() where T : Patch, new()
+        public static void RegisterPatch<T>() where T : Patches.Patch, new()
         {
             if (HarmonyInstance == null)
             {

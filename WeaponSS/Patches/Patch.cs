@@ -3,7 +3,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 
 
-namespace WeaponStatShower.Patch
+namespace WeaponStatShower.Patches
 {
 #pragma warning disable CS8600
 #pragma warning disable CS8618

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WeaponStatShower.Patch
+namespace WeaponStatShower.Patches
 {
     [Flags]
     public enum PatchType : byte
