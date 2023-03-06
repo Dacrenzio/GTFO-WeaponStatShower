@@ -58,7 +58,7 @@ namespace WeaponStatShower.Utils
         {//TODO: aggiungere solo descrizioni utili
             if (archetypeDataBlock.SpecialChargetupTime > 0)
             {
-                string chargeString = archetypeDataBlock.SpecialChargetupTime > 0.3 ? "Long Charge-Up" : "Short Charge-Up";
+                string chargeString = archetypeDataBlock.SpecialChargetupTime > 0.4 ? "Long Charge-Up" : "Short Charge-Up";
 
                 string[] lines = GearDescription.Split("\n");
                 foreach (string line in lines)
@@ -110,7 +110,7 @@ namespace WeaponStatShower.Utils
 
                 builder.Append("<#55022B>");
                 builder.Append($"{Short_Precision} ");
-                builder.Append(archeTypeDataBlock.PrecisionDamageMulti);
+                builder.Append(FormatFloat(archeTypeDataBlock.PrecisionDamageMulti));
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
