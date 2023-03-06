@@ -3,7 +3,7 @@ using CellMenu;
 using GameData;
 using Gear;
 using Player;
-using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace WeaponStatShower
@@ -18,11 +18,17 @@ namespace WeaponStatShower
         public override string Name { get; } = PatchName;
         public override bool Enabled => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<bool>(ConfigEnabled).Value;
 
+        private static readonly Dictionary<string, float[]> EnemyDatas = new Dictionary<string, float[]>();
+
+
 
         public override void Initialize()
         {
             Instance = this;
             WeaponStatShowerPlugin.Instance.Config.Bind(ConfigEnabled, true, new ConfigDescription("Show the stats of a weapon."));
+            EnemyDatas.Add("Striker", new float[] { 20, 3, 2 });
+            EnemyDatas.Add("Shooter", new float[] { 30, 5, 2 });
+            EnemyDatas.Add("Scout", new float[] { 42, 3, 2 });
         }
 
         public override void Execute()
@@ -34,6 +40,8 @@ namespace WeaponStatShower
 
         public static void CM_InventorySlotItem__LoadData__Postfix(CM_InventorySlotItem __instance, GearIDRange idRange, bool clickable, bool detailedInfo)
         {
+            if (__instance == null) return;
+
             uint categoryID = idRange.GetCompID(eGearComponent.Category);
 
             GearCategoryDataBlock gearCatBlock = GameDataBlockBase<GearCategoryDataBlock>.GetBlock(categoryID);
@@ -234,7 +242,7 @@ namespace WeaponStatShower
 
             builder.Append("<#9D2929>");
             builder.Append($"{Short_Damage} ");
-            builder.Append(archeTypeDataBlock.Damage);
+            builder.Append(FormatFloat(archeTypeDataBlock.Damage));
             builder.Append(CLOSE_COLOR_TAG);
 
             if (!isSentryGun)
@@ -254,25 +262,42 @@ namespace WeaponStatShower
             builder.Append(GetTotalAmmo(archeTypeDataBlock, itemDataBlock, isSentryGun));
             builder.Append(CLOSE_COLOR_TAG);
 
+            if (archeTypeDataBlock.PrecisionDamageMulti != 1f)
+            {
+                builder.Append(DIVIDER);
+
+                builder.Append("<#55022B>");
+                builder.Append($"{Short_Precision} ");
+                builder.Append(archeTypeDataBlock.PrecisionDamageMulti);
+                builder.Append(CLOSE_COLOR_TAG);
+            }
+
+            builder.Append(DIVIDER);
+
+            builder.Append("<#AAA8FF>");
+            builder.Append($"{Short_Falloff} ");
+            builder.Append(archeTypeDataBlock.DamageFalloff);
+            builder.Append(CLOSE_COLOR_TAG);
+
             if (!isSentryGun)
             {
                 builder.Append(DIVIDER);
 
                 builder.Append("<#C0FF00>");
                 builder.Append($"{Short_Reload} ");
-                builder.Append(archeTypeDataBlock.DefaultReloadTime);
+                builder.Append(FormatFloat(archeTypeDataBlock.DefaultReloadTime));
                 builder.Append(CLOSE_COLOR_TAG);
             }
-
-            builder.Append("\n");
 
             bool nonStandardStagger = archeTypeDataBlock.StaggerDamageMulti != 1f;
 
             if (nonStandardStagger)
             {
+                builder.Append(DIVIDER);
+
                 builder.Append("<color=green>");
                 builder.Append($"{Short_Stagger} ");
-                builder.Append(archeTypeDataBlock.StaggerDamageMulti);
+                builder.Append(FormatFloat(archeTypeDataBlock.StaggerDamageMulti));
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
@@ -281,24 +306,20 @@ namespace WeaponStatShower
 
             if (pierce)
             {
-                if (nonStandardStagger)
-                    builder.Append(DIVIDER);
+                builder.Append(DIVIDER);
 
                 builder.Append("<#004E2C>");
                 builder.Append($"{Short_PierceCount} ");
                 builder.Append(archeTypeDataBlock.PiercingDamageCountLimit);
                 builder.Append(CLOSE_COLOR_TAG);
-
-                if (nonStandardStagger)
-                    builder.Append("\n");
             }
 
             bool isShotgun = archeTypeDataBlock.ShotgunBulletCount > 0;
 
             if (isShotgun)
             {
-                if (!pierce && nonStandardStagger)
-                    builder.Append(DIVIDER);
+                
+                builder.Append(DIVIDER);
 
                 builder.Append("<#55022B>");
                 builder.Append($"{Short_ShotgunPelletCount} ");
@@ -311,14 +332,11 @@ namespace WeaponStatShower
                 builder.Append($"{Short_ShotgunSpread} ");
                 builder.Append(archeTypeDataBlock.ShotgunBulletSpread);
                 builder.Append(CLOSE_COLOR_TAG);
-
-                builder.Append("\n");
             }
 
             if (archeTypeDataBlock.BurstShotCount > 1 && archeTypeDataBlock.FireMode == eWeaponFireMode.Burst)
             {
-                if (!isShotgun && nonStandardStagger)
-                    builder.Append(DIVIDER);
+                builder.Append(DIVIDER);
 
                 builder.Append("<#025531>");
                 builder.Append($"{Short_BurstShotCount} ");
@@ -329,21 +347,20 @@ namespace WeaponStatShower
 
                 builder.Append("<#18A4A9>");
                 builder.Append($"{Short_BurstDelay} ");
-                builder.Append(archeTypeDataBlock.BurstDelay);
+                builder.Append(FormatFloat(archeTypeDataBlock.BurstDelay));
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
-            if (archeTypeDataBlock.SpecialChargetupTime > 0)
-            {
-                builder.Append(DIVIDER);
+            builder.Append("\n\n");
 
-                builder.Append("<#AAA8FF>");
-                builder.Append($"{Short_ChargeUp} ");
-                builder.Append(archeTypeDataBlock.SpecialChargetupTime);
-                builder.Append(CLOSE_COLOR_TAG);
-            }
+            builder.Append(GetKillList(archeTypeDataBlock, isShotgun));
 
             return builder.ToString();
+        }
+
+        public static float FormatFloat(float value)
+        {
+            return (float)Math.Round((decimal)value, 2);
         }
 
 
@@ -363,6 +380,43 @@ namespace WeaponStatShower
                     return itemDataBlock.ConsumableAmmoMax;
             }
             return -1;
+        }
+
+        public static string GetKillList(ArchetypeDataBlock archetypeDataBlock, bool isShotgun)
+        {
+            StringBuilder builder = new StringBuilder();
+            float damage = isShotgun ? archetypeDataBlock.Damage*archetypeDataBlock.ShotgunBulletCount : archetypeDataBlock.Damage;
+
+            foreach(string enemyName in EnemyDatas.Keys)
+            {
+                List<char> killPlace = new List<char>();
+                float[] currEnemyDatas = EnemyDatas[enemyName];
+                if (damage * currEnemyDatas[1] * currEnemyDatas[2] * archetypeDataBlock.PrecisionDamageMulti >= currEnemyDatas[0])
+                {
+                    killPlace.Add('o');
+                    if(damage * currEnemyDatas[1] >= currEnemyDatas[0])
+                    {
+                        killPlace.Add('h');
+                        if(damage * currEnemyDatas[2] >= currEnemyDatas[0])
+                        {
+                            killPlace.Add('b');
+                            if (damage > currEnemyDatas[0])
+                            {
+                                killPlace.Add('c');
+                            }
+                        }
+                    }
+                }
+
+                if(killPlace.Count > 0)
+                {
+                    killPlace.Reverse();
+                    builder.Append(enemyName+": [" + string.Join(",",killPlace.ToArray()) + "]\n");
+                   
+                }
+            }
+            
+            return builder.ToString();
         }
 
         public static int GetTotalAmmo(ArchetypeDataBlock archetypeDataBlock, ItemDataBlock itemDataBlock, bool isSentryGun = false)
@@ -403,6 +457,7 @@ namespace WeaponStatShower
         public static string Short_Damage { get; } = "Dmg";
         public static string Short_Clip { get; } = "Clp";
         public static string Short_MaxAmmo { get; } = "Max";
+        public static string Short_Falloff { get; } = "Dist";
         public static string Short_Reload { get; } = "Rld";
         public static string Short_Stagger { get; } = "Stgr";
         public static string Short_Precision { get; } = "Pcsn";
