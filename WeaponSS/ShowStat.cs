@@ -71,7 +71,7 @@ namespace WeaponStatShower
                 String[] lines = __instance.GearDescription.Split("\n");
                 foreach (String line in lines)
                 {
-                    if (line.Contains("CHARGE"))
+                    if (line.ToUpper().Contains("CHARGE"))
                     {
                         return __instance.GearDescription.Replace(line, chargeString);
                     }
