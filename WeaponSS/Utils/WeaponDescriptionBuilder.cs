@@ -12,12 +12,11 @@ namespace WeaponStatShower.Utils
 
         private PlayerDataBlock _playerDataBlock;
         private readonly Dictionary<string, float[]> EnemyDatas = new Dictionary<string, float[]>();
-        private CM_InventorySlotItem __instance;
         private GearIDRange idRange;
 
-        public WeaponDescriptionBuilder(CM_InventorySlotItem __instance, GearIDRange idRange) 
+        public WeaponDescriptionBuilder(PlayerDataBlock _playerDataBlock, GearIDRange idRange) 
         {
-            this.__instance = __instance;
+            this._playerDataBlock = _playerDataBlock;
             this.idRange = idRange;
 
             EnemyDatas.Add("Striker", new float[] { 20, 3, 2 });
@@ -25,7 +24,7 @@ namespace WeaponStatShower.Utils
             EnemyDatas.Add("Scout", new float[] { 42, 3, 2 });
         }
 
-        public void DescriptionFormatter()
+        public string DescriptionFormatter(string GearDescription)
         {
             uint categoryID = idRange.GetCompID(eGearComponent.Category);
 
@@ -35,7 +34,9 @@ namespace WeaponStatShower.Utils
 
             if (itemDataBlock.inventorySlot == InventorySlot.GearMelee)
             {
-                PopulateMelee(gearCatBlock, itemDataBlock);
+                MeleeArchetypeDataBlock meleeArchetypeDataBlock = MeleeArchetypeDataBlock.GetBlock(GearBuilder.GetMeleeArchetypeID(gearCatBlock));
+
+                return GearDescription + "\n\n" + GetFormatedWeaponStats(meleeArchetypeDataBlock, itemDataBlock);
             }
             else
             {
@@ -47,37 +48,30 @@ namespace WeaponStatShower.Utils
                     ? SentryGunInstance_Firing_Bullets.GetArchetypeDataForFireMode(weaponFireMode)
                     : ArchetypeDataBlock.GetBlock(GearBuilder.GetArchetypeID(gearCatBlock, weaponFireMode));
 
-                __instance.GearDescription = VerboseDescriptionFormatter(__instance, archetypeDataBlock);
+                GearDescription = VerboseDescriptionFormatter(GearDescription, archetypeDataBlock);
 
-                __instance.GearDescription += "\n\n" + GetFormatedWeaponStats(archetypeDataBlock, itemDataBlock, isSentryGun);
+                return GearDescription + "\n\n" + GetFormatedWeaponStats(archetypeDataBlock, itemDataBlock, isSentryGun);
             }
         }
 
-        private void PopulateMelee(GearCategoryDataBlock gearCatBlock, ItemDataBlock itemDataBlock)
-        {
-            MeleeArchetypeDataBlock meleeArchetypeDataBlock = MeleeArchetypeDataBlock.GetBlock(GearBuilder.GetMeleeArchetypeID(gearCatBlock));
-
-            __instance.GearDescription = __instance.GearDescription + "\n\n" + GetFormatedWeaponStats(meleeArchetypeDataBlock, itemDataBlock);
-        }
-
-        private string VerboseDescriptionFormatter(CM_InventorySlotItem __instance, ArchetypeDataBlock archetypeDataBlock)
+        private string VerboseDescriptionFormatter(string GearDescription, ArchetypeDataBlock archetypeDataBlock)
         {//TODO: aggiungere solo descrizioni utili
             if (archetypeDataBlock.SpecialChargetupTime > 0)
             {
                 string chargeString = archetypeDataBlock.SpecialChargetupTime > 0.3 ? "Long Charge-Up" : "Short Charge-Up";
 
-                string[] lines = __instance.GearDescription.Split("\n");
+                string[] lines = GearDescription.Split("\n");
                 foreach (string line in lines)
                 {
                     if (line.ToUpper().Contains("CHARGE"))
                     {
-                        return __instance.GearDescription.Replace(line, chargeString);
+                        return GearDescription.Replace(line, chargeString);
                     }
                 }
 
-                return __instance.GearDescription += "\n" + chargeString;
+                return GearDescription += "\n" + chargeString;
             }
-            return __instance.GearDescription;
+            return GearDescription;
         }
 
         private string GetFormatedWeaponStats(ArchetypeDataBlock archeTypeDataBlock, ItemDataBlock itemDataBlock, bool isSentryGun = false)

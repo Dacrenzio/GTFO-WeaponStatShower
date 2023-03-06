@@ -30,7 +30,7 @@ namespace WeaponStatShower.Patches
         public override void Execute()
         {
             WeaponStatShowerPlugin.LogInfo("Before getting the Execution");
-            PatchMethod<CM_InventorySlotItem>(nameof(CM_InventorySlotItem.LoadData), PatchType.Postfix);
+            this.PatchMethod<CM_InventorySlotItem>(nameof(CM_InventorySlotItem.LoadData), PatchType.Postfix);
         }
 
 
@@ -38,9 +38,11 @@ namespace WeaponStatShower.Patches
         {
             if (__instance == null) return;
 
-            _weaponDescriptionBuilder = new WeaponDescriptionBuilder(__instance);
+            PlayerDataBlock _playerDataBlock = PlayerDataBlock.GetBlock(1U);
 
-            _weaponDescriptionBuilder.DescriptionFormatter(idRange);
+            _weaponDescriptionBuilder = new WeaponDescriptionBuilder(_playerDataBlock, idRange);
+
+            __instance.GearDescription = _weaponDescriptionBuilder.DescriptionFormatter(__instance.GearDescription);
         }
     }
 }
