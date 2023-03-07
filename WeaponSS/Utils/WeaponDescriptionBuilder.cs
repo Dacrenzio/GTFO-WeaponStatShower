@@ -34,6 +34,8 @@ namespace WeaponStatShower.Utils
             {
                 MeleeArchetypeDataBlock meleeArchetypeDataBlock = MeleeArchetypeDataBlock.GetBlock(GearBuilder.GetMeleeArchetypeID(gearCatBlock));
 
+                GearDescription = VerboseDescriptionFormatter(meleeArchetypeDataBlock);
+
                 return GearDescription + "\n\n" + GetFormatedWeaponStats(meleeArchetypeDataBlock, itemDataBlock);
             }
             else
@@ -52,6 +54,31 @@ namespace WeaponStatShower.Utils
 
                 return GearDescription + GetFormatedWeaponStats(archetypeDataBlock, itemDataBlock, isSentryGun);
             }
+        }
+
+        private string VerboseDescriptionFormatter(MeleeArchetypeDataBlock meleeArchetypeDataBlock)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            switch (meleeArchetypeDataBlock.persistentID)
+            {
+                case 1:
+                    sb.AppendLine("Balanced");
+                    break;
+                case 2:
+                case 4:
+                    sb.AppendLine("Fast");
+                    break;
+                case 3:
+                    sb.AppendLine("Slow");
+                    break;
+            }
+
+            sb.AppendLine(meleeArchetypeDataBlock.CameraDamageRayLength < 1.76?"Short Range": meleeArchetypeDataBlock.CameraDamageRayLength < 3? "Medium Range" : "Long Range");
+
+            sb.Append(meleeArchetypeDataBlock.CanHitMultipleEnemies? "Piercing\n": "");
+
+            return sb.ToString();
         }
 
         private string VerboseDescriptionFormatter(ArchetypeDataBlock archetypeDataBlock, bool isSentryGun)
@@ -136,8 +163,6 @@ namespace WeaponStatShower.Utils
                 sb.AppendLine(archetypeDataBlock.SpecialChargetupTime > 0.4 ?
                     "Long Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")" :
                     "Short Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")");
-
-            sb.AppendLine("");
 
             return sb.ToString();
         }
