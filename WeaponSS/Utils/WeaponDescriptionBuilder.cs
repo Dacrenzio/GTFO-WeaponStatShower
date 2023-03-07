@@ -50,7 +50,7 @@ namespace WeaponStatShower.Utils
 
                 GearDescription = VerboseDescriptionFormatter(archetypeDataBlock, isSentryGun);
 
-                return GearDescription + "\n\n" + GetFormatedWeaponStats(archetypeDataBlock, itemDataBlock, isSentryGun);
+                return GearDescription + GetFormatedWeaponStats(archetypeDataBlock, itemDataBlock, isSentryGun);
             }
         }
 
@@ -73,7 +73,12 @@ namespace WeaponStatShower.Utils
                     break;
                 case eWeaponFireMode.Burst:
                 case eWeaponFireMode.SentryGunBurst:
-                    sb.AppendLine("Burst FireMode");
+                    if (archetypeDataBlock.BurstShotCount != 1){
+                        sb.AppendLine("Burst FireMode (" + archetypeDataBlock.BurstShotCount + ")");
+                    }
+                    else{
+                        sb.AppendLine("Semi Automatic");
+                    }
                     break;
                 case eWeaponFireMode.SemiBurst:
                     sb.AppendLine("SemiBurst FireMode");
@@ -88,31 +93,35 @@ namespace WeaponStatShower.Utils
 
             switch (archetypeDataBlock.RecoilDataID)
             {
-                case 0U:
-                    sb.AppendLine("Low Recoil");
-                    break;
-                case 1U:
+                case 3U:
+                case 8U:
+                case 13U:
+                case 31U:
                     sb.AppendLine("Balanced Recoil");
                     break;
-                case 2U:
-                    sb.AppendLine("High Recoil");
+                case 5U:
+                    sb.AppendLine("Heavy Recoil");
                     break;
-                case 3U:
-                    sb.AppendLine("Very-High Recoil");
-                    break;
-                case 4U:
-                    sb.AppendLine("4U Recoil");
+                case 47:
+                case 48:
+                    sb.AppendLine("Hard to Control");
                     break;
                 default:
-                    WeaponStatShowerPlugin.LogError("Recoil not considered");
                     break;
             }
 
             if (archetypeDataBlock.SpecialChargetupTime > 0)
-                sb.AppendLine(archetypeDataBlock.SpecialChargetupTime > 0.4 ? "Long Charge-up": "Short Charge-up") ;
-            
+                sb.AppendLine(archetypeDataBlock.SpecialChargetupTime > 0.4 ?
+                    "Long Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")":
+                    "Short Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")");
+
+            sb.AppendLine("");
+
             return sb.ToString();
         }
+
+
+
 
         private string GetFormatedWeaponStats(ArchetypeDataBlock archeTypeDataBlock, ItemDataBlock itemDataBlock, bool isSentryGun = false)
         {
@@ -144,14 +153,12 @@ namespace WeaponStatShower.Utils
             builder.Append(GetTotalAmmo(archeTypeDataBlock, itemDataBlock, isSentryGun));
             builder.Append(CLOSE_COLOR_TAG);
 
-            builder.Append("\n");
-
 
             if (archeTypeDataBlock.PrecisionDamageMulti != 1f)
             {
                 builder.Append(DIVIDER);
 
-                builder.Append("<#55022B>");
+                builder.Append("<#18A4A9>");
                 builder.Append($"{Short_Precision} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.PrecisionDamageMulti));
                 builder.Append(CLOSE_COLOR_TAG);
@@ -161,7 +168,7 @@ namespace WeaponStatShower.Utils
 
             builder.Append("<#AAA8FF>");
             builder.Append($"{Short_Falloff} ");
-            builder.Append((int)archeTypeDataBlock.DamageFalloff.x);
+            builder.Append(((int)archeTypeDataBlock.DamageFalloff.x).ToString() + "m");
             builder.Append(CLOSE_COLOR_TAG);
 
             if (!isSentryGun)
@@ -174,7 +181,6 @@ namespace WeaponStatShower.Utils
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
-            builder.Append("\n");
 
             bool nonStandardStagger = archeTypeDataBlock.StaggerDamageMulti != 1f;
 
@@ -205,7 +211,6 @@ namespace WeaponStatShower.Utils
 
             if (isShotgun)
             {
-
                 builder.Append(DIVIDER);
 
                 builder.Append("<#55022B>");
@@ -221,24 +226,7 @@ namespace WeaponStatShower.Utils
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
-            if (archeTypeDataBlock.BurstShotCount > 1 && archeTypeDataBlock.FireMode == eWeaponFireMode.Burst)
-            {
-                builder.Append(DIVIDER);
-
-                builder.Append("<#025531>");
-                builder.Append($"{Short_BurstShotCount} ");
-                builder.Append(archeTypeDataBlock.BurstShotCount);
-                builder.Append(CLOSE_COLOR_TAG);
-
-                builder.Append(DIVIDER);
-
-                builder.Append("<#18A4A9>");
-                builder.Append($"{Short_BurstDelay} ");
-                builder.Append(FormatFloat(archeTypeDataBlock.BurstDelay));
-                builder.Append(CLOSE_COLOR_TAG);
-            }
-
-            builder.Append("\n\n");
+            builder.AppendLine("\n");
 
             builder.Append(GetKillList(archeTypeDataBlock, isShotgun));
 
@@ -431,9 +419,11 @@ namespace WeaponStatShower.Utils
         {
             StringBuilder builder = new StringBuilder();
             float damage = isShotgun ? archetypeDataBlock.Damage * archetypeDataBlock.ShotgunBulletCount : archetypeDataBlock.Damage;
+            int count = 0;
 
-            foreach (string enemyName in EnemyDatas.Keys)
+            for(int i= 0; i < EnemyDatas.Count; i++)
             {
+                string enemyName = EnemyDatas.Keys.ElementAt(i);
                 List<char> killPlace = new List<char>();
                 float[] currEnemyDatas = EnemyDatas[enemyName];
                 if (damage * currEnemyDatas[1] * currEnemyDatas[2] * archetypeDataBlock.PrecisionDamageMulti >= currEnemyDatas[0])
@@ -456,8 +446,16 @@ namespace WeaponStatShower.Utils
                 if (killPlace.Count > 0)
                 {
                     killPlace.Reverse();
-                    builder.Append(enemyName + ": [" + string.Join(",", killPlace.ToArray()) + "]\n");
+                    builder.Append(enemyName + ": [" + string.Join(",", killPlace.ToArray()) + "]");
 
+                    if (count++ % 2 == 1 && i != EnemyDatas.Count - 1)
+                    {
+                        builder.Append('\n');
+                    }
+                    else if(i != EnemyDatas.Count - 1)
+                    {
+                        builder.Append(" "+ DIVIDER+ " ");
+                    }
                 }
             }
 
@@ -484,8 +482,5 @@ namespace WeaponStatShower.Utils
         public static string Short_PierceCount { get; } = "Prc";
         public static string Short_ShotgunPelletCount { get; } = "Sh.Plts";
         public static string Short_ShotgunSpread { get; } = "Sh.Sprd";
-        public static string Short_BurstShotCount { get; } = "Brst.Sht";
-        public static string Short_BurstDelay { get; } = "Brst.Dly";
-        public static string Short_ChargeUp { get; } = "Chrg";
     }
 }
