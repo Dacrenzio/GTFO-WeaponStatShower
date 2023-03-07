@@ -11,7 +11,7 @@ namespace WeaponStatShower.Utils
         {
             foreach (string monster in activatedSleepers)
             {
-                switch (monster.ToUpper().Trim())
+                switch (monster.Trim())
                 {
                     case "NONE": 
                         EnemyDatas.Clear();
@@ -47,7 +47,7 @@ namespace WeaponStatShower.Utils
                         EnemyDatas.TryAdd("C-SCOUT", new float[] { 60, 1, 2 , 1 });
                         break;
                     default:
-                        WeaponStatShowerPlugin.LogWarning("You inserted an incorrect value in the config: " + monster.ToUpper().Trim());
+                        WeaponStatShowerPlugin.LogWarning("You inserted an incorrect value in the config: " + monster.Trim());
                         break;
                 }
             }
@@ -143,7 +143,7 @@ namespace WeaponStatShower.Utils
             }
             else
             {
-                return damage * currEnemyDatas[2] * currEnemyDatas[1] >= currEnemyDatas[0];
+                return damage * prcsnMultiplier * currEnemyDatas[2] * currEnemyDatas[1] >= currEnemyDatas[0];
 
             }
         }

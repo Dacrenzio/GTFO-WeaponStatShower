@@ -23,6 +23,16 @@ namespace WeaponStatShower.Utils
             sleepersDatas = new SleepersDatas(activatedSleepers);
         }
 
+        public void UpdateSleepersDatas(string[] activatedSleepers)
+        {
+            if (activatedSleepers[0].Length == 0)
+            {
+                WeaponStatShowerPlugin.LogWarning("Empty String in the config file, applying Default values");
+                activatedSleepers = new string[] { "STRIKER", "SHOOTER", "SCOUT" };
+            }
+            sleepersDatas = new SleepersDatas(activatedSleepers);
+        }
+
         public string DescriptionFormatter(string GearDescription)
         {
             uint categoryID = idRange.GetCompID(eGearComponent.Category);

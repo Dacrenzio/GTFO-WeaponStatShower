@@ -16,7 +16,10 @@ namespace WeaponStatShower.Patches
         private static readonly ConfigDefinition ConfigEnabled = new(PatchName, "Enabled");
         private static readonly ConfigDefinition ConfigSleepers = new(PatchName, "SleepersShown");
         public override bool Enabled => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<bool>(ConfigEnabled).Value;
-        private static string ShownSleepers => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<string>(ConfigSleepers).Value.Trim();
+        private static string ShownSleepers => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<string>(ConfigSleepers).Value.Trim().ToUpper();
+        private static string CurrShownSleepers;
+        private static string PrevShownSleepers;
+
         private static WeaponDescriptionBuilder? _weaponDescriptionBuilder;
 
 
@@ -24,14 +27,14 @@ namespace WeaponStatShower.Patches
         public override void Initialize()
         {
             Instance = this;
-
             WeaponStatShowerPlugin.Instance.Config.Bind(ConfigEnabled, true, new ConfigDescription("Show the stats of a weapon."));
             WeaponStatShowerPlugin.Instance.Config.Bind<string>(ConfigSleepers, "STRIKER, SHOOTER, SCOUT",
                 new ConfigDescription("Select which Sleepers are shown, separeted by a comma.\n"+
                 "Acceptable values: ALL, NONE, STRIKER, SHOOTER, SCOUT, BIG_STRIKER, BIG_SHOOTER, CHARGER, CHARGER_SCOUT"));
 
-            string[] sleepers = ShownSleepers.Split(',');
-            _weaponDescriptionBuilder = new WeaponDescriptionBuilder(sleepers);
+            _weaponDescriptionBuilder = new WeaponDescriptionBuilder(ShownSleepers.Split(','));
+            CurrShownSleepers = ShownSleepers;
+            PrevShownSleepers = ShownSleepers;
         }
 
         public override void Execute()
@@ -47,6 +50,15 @@ namespace WeaponStatShower.Patches
             {
                 WeaponStatShowerPlugin.LogError("Something went wrong with the DescriptionBuilder");
                 return;
+            }
+
+            WeaponStatShowerPlugin.Instance.Config.Reload();
+            CurrShownSleepers = WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<string>(ConfigSleepers).Value.Trim().ToUpper();
+
+            if (!PrevShownSleepers.Equals(CurrShownSleepers))
+            {
+                _weaponDescriptionBuilder.UpdateSleepersDatas(CurrShownSleepers.Split(','));
+                PrevShownSleepers = CurrShownSleepers;
             }
 
             _weaponDescriptionBuilder.idRange = idRange;
