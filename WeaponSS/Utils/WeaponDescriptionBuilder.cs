@@ -14,14 +14,34 @@ namespace WeaponStatShower.Utils
         private readonly Dictionary<string, float[]> EnemyDatas = new Dictionary<string, float[]>();
         private GearIDRange idRange;
 
-        public WeaponDescriptionBuilder(PlayerDataBlock _playerDataBlock, GearIDRange idRange) 
+        public WeaponDescriptionBuilder(PlayerDataBlock _playerDataBlock, GearIDRange idRange, string[] activatedSleepers) 
         {
             this._playerDataBlock = _playerDataBlock;
             this.idRange = idRange;
 
-            EnemyDatas.Add("Striker", new float[] { 20, 3, 2 });
-            EnemyDatas.Add("Shooter", new float[] { 30, 5, 2 });
-            EnemyDatas.Add("Scout", new float[] { 42, 3, 2 });
+            foreach(string monster in activatedSleepers)
+            {
+                switch (monster.ToUpper().Trim())
+                {
+                    case "ALL":
+                        EnemyDatas.TryAdd("STRIKER", new float[] { 20, 3, 2 });
+                        EnemyDatas.TryAdd("SHOOTER", new float[] { 30, 5, 2 });
+                        EnemyDatas.TryAdd("SCOUT", new float[] { 42, 3, 2 });
+                        break;
+                    case "STRIKER":
+                        EnemyDatas.TryAdd("STRIKER", new float[] { 20, 3, 2 });
+                        break;
+                    case "SHOOTER":
+                        EnemyDatas.TryAdd("SHOOTER", new float[] { 30, 5, 2 });
+                        break;
+                    case "SCOUT":
+                        EnemyDatas.TryAdd("SCOUT", new float[] { 42, 3, 2 });
+                        break;
+                    default:
+                        WeaponStatShowerPlugin.LogWarning("You inserted an incorrect value in the config.");
+                        break;
+                }
+            }
         }
 
         public string DescriptionFormatter(string GearDescription)

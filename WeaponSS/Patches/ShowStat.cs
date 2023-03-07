@@ -2,7 +2,6 @@
 using CellMenu;
 using GameData;
 using Gear;
-using Player;
 using WeaponStatShower.Utils;
 
 namespace WeaponStatShower.Patches
@@ -11,26 +10,29 @@ namespace WeaponStatShower.Patches
     {
         private const string PatchName = nameof(ShowStat);
         private const PatchType patchType = PatchType.Postfix;
-        private static readonly ConfigDefinition ConfigEnabled = new(PatchName, "Enabled");
         public static Patch Instance { get; private set; }
         public override string Name { get; } = PatchName;
-        public override bool Enabled => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<bool>(ConfigEnabled).Value;
 
-        private static WeaponDescriptionBuilder _weaponDescriptionBuilder;
+        private static readonly ConfigDefinition ConfigEnabled = new(PatchName, "Enabled");
+        private static readonly ConfigDefinition ConfigSleepers = new(PatchName, "SleepersShown");
+        public override bool Enabled => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<bool>(ConfigEnabled).Value;
+        private static string ShownSleepers => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<string>(ConfigSleepers).Value;
+        private static WeaponDescriptionBuilder? _weaponDescriptionBuilder;
 
 
 
         public override void Initialize()
         {
             Instance = this;
+
             WeaponStatShowerPlugin.Instance.Config.Bind(ConfigEnabled, true, new ConfigDescription("Show the stats of a weapon."));
-            
+            WeaponStatShowerPlugin.Instance.Config.Bind<string>(ConfigSleepers, "STRIKER, SHOOTER, SCOUT",
+                new ConfigDescription("Select which Sleepers are shown, separeted by a comma.\n Acceptable values: ALL, STRIKER, SHOOTER, SCOUT"));
         }
 
         public override void Execute()
         {
-            WeaponStatShowerPlugin.LogInfo("Before getting the Execution");
-            this.PatchMethod<CM_InventorySlotItem>(nameof(CM_InventorySlotItem.LoadData), PatchType.Postfix);
+            this.PatchMethod<CM_InventorySlotItem>(nameof(CM_InventorySlotItem.LoadData), patchType);
         }
 
 
@@ -40,7 +42,9 @@ namespace WeaponStatShower.Patches
 
             PlayerDataBlock _playerDataBlock = PlayerDataBlock.GetBlock(1U);
 
-            _weaponDescriptionBuilder = new WeaponDescriptionBuilder(_playerDataBlock, idRange);
+            string[] sleepers = ShownSleepers.Trim().Split(',');
+
+            _weaponDescriptionBuilder = new WeaponDescriptionBuilder(_playerDataBlock, idRange, sleepers);
 
             __instance.GearDescription = _weaponDescriptionBuilder.DescriptionFormatter(__instance.GearDescription);
         }
