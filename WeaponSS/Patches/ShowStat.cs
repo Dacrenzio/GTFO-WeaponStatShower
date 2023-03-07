@@ -28,7 +28,7 @@ namespace WeaponStatShower.Patches
             WeaponStatShowerPlugin.Instance.Config.Bind(ConfigEnabled, true, new ConfigDescription("Show the stats of a weapon."));
             WeaponStatShowerPlugin.Instance.Config.Bind<string>(ConfigSleepers, "STRIKER, SHOOTER, SCOUT",
                 new ConfigDescription("Select which Sleepers are shown, separeted by a comma.\n"+
-                "Acceptable values: ALL, STRIKER, SHOOTER, SCOUT, BIG_STRIKER, BIG_SHOOTER, CHARGER"));
+                "Acceptable values: ALL, NONE, STRIKER, SHOOTER, SCOUT, BIG_STRIKER, BIG_SHOOTER, CHARGER, CHARGER_SCOUT"));
 
             string[] sleepers = ShownSleepers.Split(',');
             _weaponDescriptionBuilder = new WeaponDescriptionBuilder(sleepers);

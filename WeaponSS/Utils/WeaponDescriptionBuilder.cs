@@ -47,6 +47,8 @@ namespace WeaponStatShower.Utils
                     ? SentryGunInstance_Firing_Bullets.GetArchetypeDataForFireMode(weaponFireMode)
                     : ArchetypeDataBlock.GetBlock(GearBuilder.GetArchetypeID(gearCatBlock, weaponFireMode));
 
+                if (archetypeDataBlock == null) return GearDescription; //case of non-weapon tools such as BIO_TRACKER/MINE_DEPLOYER
+
                 GearDescription = VerboseDescriptionFormatter(archetypeDataBlock, isSentryGun);
 
                 return GearDescription + GetFormatedWeaponStats(archetypeDataBlock, itemDataBlock, isSentryGun);
@@ -106,6 +108,26 @@ namespace WeaponStatShower.Utils
                     sb.AppendLine("Hard to Control");
                     break;
                 default:
+                    break;
+            }
+
+            switch (archetypeDataBlock.ShotgunBulletSpread)
+            {
+                case 0: break;
+                case 1:
+                    sb.AppendLine("Chocked Spread");
+                    break;
+                case 2:
+                    sb.AppendLine("Small Spread");
+                    break;
+                case 3:
+                    sb.AppendLine("Medium Spread");
+                    break;
+                case 4:
+                    sb.AppendLine("Heavy Spread");
+                    break;
+                default:
+                    WeaponStatShowerPlugin.LogError(archetypeDataBlock.name+": spread not considered: "+ archetypeDataBlock.ShotgunBulletSpread);
                     break;
             }
 
@@ -215,13 +237,6 @@ namespace WeaponStatShower.Utils
                 builder.Append("<#55022B>");
                 builder.Append($"{Short_ShotgunPelletCount} ");
                 builder.Append(archeTypeDataBlock.ShotgunBulletCount);
-                builder.Append(CLOSE_COLOR_TAG);
-
-                builder.Append(DIVIDER);
-
-                builder.Append("<#A918A7>");
-                builder.Append($"{Short_ShotgunSpread} ");
-                builder.Append(archeTypeDataBlock.ShotgunBulletSpread);
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
