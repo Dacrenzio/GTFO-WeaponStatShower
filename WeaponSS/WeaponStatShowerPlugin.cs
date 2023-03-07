@@ -6,14 +6,14 @@ using WeaponStatShower.Patches;
 
 namespace WeaponStatShower
 {
-    [BepInPlugin(GUID, ModName, "0.1")]
+    [BepInPlugin(GUID, ModName, "1.0.0")]
     [BepInProcess("GTFO.exe")]
     public class WeaponStatShowerPlugin : BasePlugin
     {
 
         internal const string ModName = "Weapon Stat Shower";
 
-        internal const string GUID = "dev.dacre.WSS";
+        internal const string GUID = "WeaponStatShower";
 
         private const string SectionMain = "Config";
         private static readonly ConfigDefinition configDefinition = new(SectionMain, "Version");

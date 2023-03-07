@@ -446,9 +446,8 @@ namespace WeaponStatShower.Utils
         public static string Short_Falloff { get; } = "Dist";
         public static string Short_Reload { get; } = "Rld";
         public static string Short_Stagger { get; } = "Stgr";
-        public static string Short_Precision { get; } = "Pcsn";
-        public static string Short_PierceCount { get; } = "Prc";
-        public static string Short_ShotgunPelletCount { get; } = "Sh.Plts";
-        public static string Short_ShotgunSpread { get; } = "Sh.Sprd";
+        public static string Short_Precision { get; } = "Prcsn";
+        public static string Short_PierceCount { get; } = "Pierc";
+        public static string Short_ShotgunPelletCount { get; } = "Pelts";
     }
 }
