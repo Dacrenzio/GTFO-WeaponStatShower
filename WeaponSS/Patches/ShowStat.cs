@@ -16,9 +16,8 @@ namespace WeaponStatShower.Patches
         private static readonly ConfigDefinition ConfigEnabled = new(PatchName, "Enabled");
         private static readonly ConfigDefinition ConfigSleepers = new(PatchName, "SleepersShown");
         public override bool Enabled => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<bool>(ConfigEnabled).Value;
-        private static string ShownSleepers => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<string>(ConfigSleepers).Value.Trim().ToUpper();
         private static string CurrShownSleepers;
-        private static string PrevShownSleepers;
+        private static string PrevShownSleepers = "PLACEHOLDER";
 
         private static WeaponDescriptionBuilder? _weaponDescriptionBuilder;
 
@@ -32,9 +31,7 @@ namespace WeaponStatShower.Patches
                 new ConfigDescription("Select which Sleepers are shown, separeted by a comma.\n"+
                 "Acceptable values: ALL, NONE, STRIKER, SHOOTER, SCOUT, BIG_STRIKER, BIG_SHOOTER, CHARGER, CHARGER_SCOUT"));
 
-            _weaponDescriptionBuilder = new WeaponDescriptionBuilder(ShownSleepers.Split(','));
-            CurrShownSleepers = ShownSleepers;
-            PrevShownSleepers = ShownSleepers;
+            _weaponDescriptionBuilder = new WeaponDescriptionBuilder();
         }
 
         public override void Execute()

@@ -14,7 +14,7 @@ namespace WeaponStatShower.Utils
                 switch (monster.Trim())
                 {
                     case "NONE": 
-                        EnemyDatas.Clear();
+                        EnemyDatas.Clear(); //just to be sure
                         return;
                     case "ALL":
                         EnemyDatas.TryAdd("STRK", new float[] { 20, 3, 2 , 0 });

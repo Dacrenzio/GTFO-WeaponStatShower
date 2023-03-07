@@ -13,22 +13,12 @@ namespace WeaponStatShower.Utils
         public PlayerDataBlock _playerDataBlock { get; set; }
         public GearIDRange idRange {  get; set; }
 
-        public WeaponDescriptionBuilder(string[] activatedSleepers) 
-        {
-            if (activatedSleepers[0].Length == 0)
-            {
-                WeaponStatShowerPlugin.LogWarning("Empty String in the config file, applying Default values");
-                activatedSleepers = new string[]{ "STRIKER", "SHOOTER", "SCOUT" };
-            }
-            sleepersDatas = new SleepersDatas(activatedSleepers);
-        }
-
         public void UpdateSleepersDatas(string[] activatedSleepers)
         {
             if (activatedSleepers[0].Length == 0)
             {
                 WeaponStatShowerPlugin.LogWarning("Empty String in the config file, applying Default values");
-                activatedSleepers = new string[] { "STRIKER", "SHOOTER", "SCOUT" };
+                activatedSleepers = new string[]{ "STRIKER", "SHOOTER", "SCOUT" };
             }
             sleepersDatas = new SleepersDatas(activatedSleepers);
         }
