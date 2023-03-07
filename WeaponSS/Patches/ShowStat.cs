@@ -28,7 +28,7 @@ namespace WeaponStatShower.Patches
             Instance = this;
             WeaponStatShowerPlugin.Instance.Config.Bind(ConfigEnabled, true, new ConfigDescription("Show the stats of a weapon."));
             WeaponStatShowerPlugin.Instance.Config.Bind<string>(ConfigSleepers, "STRIKER, SHOOTER, SCOUT",
-                new ConfigDescription("Select which Sleepers are shown, separeted by a comma.\n"+
+                new ConfigDescription("Select which Sleepers are shown, separeted by a comma.\n" +
                 "Acceptable values: ALL, NONE, STRIKER, SHOOTER, SCOUT, BIG_STRIKER, BIG_SHOOTER, CHARGER, CHARGER_SCOUT"));
 
             _weaponDescriptionBuilder = new WeaponDescriptionBuilder();
@@ -43,7 +43,7 @@ namespace WeaponStatShower.Patches
         public static void CM_InventorySlotItem__LoadData__Postfix(CM_InventorySlotItem __instance, GearIDRange idRange, bool clickable, bool detailedInfo)
         {
             if (__instance == null || !detailedInfo) return;
-            if(_weaponDescriptionBuilder == null)
+            if (_weaponDescriptionBuilder == null)
             {
                 WeaponStatShowerPlugin.LogError("Something went wrong with the DescriptionBuilder");
                 return;

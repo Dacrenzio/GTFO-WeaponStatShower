@@ -1,5 +1,4 @@
-﻿using CellMenu;
-using GameData;
+﻿using GameData;
 using Gear;
 using Player;
 using System.Text;
@@ -11,14 +10,14 @@ namespace WeaponStatShower.Utils
     {
         private SleepersDatas sleepersDatas;
         public PlayerDataBlock _playerDataBlock { get; set; }
-        public GearIDRange idRange {  get; set; }
+        public GearIDRange idRange { get; set; }
 
         public void UpdateSleepersDatas(string[] activatedSleepers)
         {
             if (activatedSleepers[0].Length == 0)
             {
                 WeaponStatShowerPlugin.LogWarning("Empty String in the config file, applying Default values");
-                activatedSleepers = new string[]{ "STRIKER", "SHOOTER", "SCOUT" };
+                activatedSleepers = new string[] { "STRIKER", "SHOOTER", "SCOUT" };
             }
             sleepersDatas = new SleepersDatas(activatedSleepers);
         }
@@ -61,7 +60,7 @@ namespace WeaponStatShower.Utils
 
             if (isSentryGun)
                 sb.AppendLine("Deployable");
-            
+
             switch (archetypeDataBlock.FireMode)
             {
                 case eWeaponFireMode.Auto:
@@ -74,10 +73,12 @@ namespace WeaponStatShower.Utils
                     break;
                 case eWeaponFireMode.Burst:
                 case eWeaponFireMode.SentryGunBurst:
-                    if (archetypeDataBlock.BurstShotCount != 1){
+                    if (archetypeDataBlock.BurstShotCount != 1)
+                    {
                         sb.AppendLine("Burst FireMode (" + archetypeDataBlock.BurstShotCount + ")");
                     }
-                    else{
+                    else
+                    {
                         sb.AppendLine("Semi Automatic");
                     }
                     break;
@@ -124,16 +125,16 @@ namespace WeaponStatShower.Utils
                     sb.AppendLine("Medium Spread");
                     break;
                 case 4:
-                    sb.AppendLine("Heavy Spread");
+                    sb.AppendLine("Large Spread");
                     break;
                 default:
-                    WeaponStatShowerPlugin.LogError(archetypeDataBlock.name+": spread not considered: "+ archetypeDataBlock.ShotgunBulletSpread);
+                    WeaponStatShowerPlugin.LogError(archetypeDataBlock.name + ": spread not considered: " + archetypeDataBlock.ShotgunBulletSpread);
                     break;
             }
 
             if (archetypeDataBlock.SpecialChargetupTime > 0)
                 sb.AppendLine(archetypeDataBlock.SpecialChargetupTime > 0.4 ?
-                    "Long Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")":
+                    "Long Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")" :
                     "Short Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")");
 
             sb.AppendLine("");

@@ -1,6 +1,6 @@
-﻿using System.Reflection;
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
 using HarmonyLib;
+using System.Reflection;
 
 
 namespace WeaponStatShower.Patches
