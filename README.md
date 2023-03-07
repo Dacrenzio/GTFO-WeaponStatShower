@@ -1,6 +1,6 @@
 # **Weapon Stat Shower**
 
-WeaponStatShower is a mod that allows player to see the stats of a selected weapon and which enemy they can kill with 1 shot and where it does kill. This mod is compatible with WeaponCustomizer and modded weapons (as far as I know).
+WeaponStatShower is a mod that allows player to see the stats of a selected weapon and which enemy they can kill with 1 shot and where it does kill. This mod is compatible with [WeaponCustomizer](https://www.nexusmods.com/gtfo/mods/14?tab=posts&BH=1) and modded weapons (as far as I know).
 
 ## Mod Summary
 

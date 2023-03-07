@@ -6,7 +6,7 @@ using WeaponStatShower.Patches;
 
 namespace WeaponStatShower
 {
-    [BepInPlugin(GUID, ModName, "1.0.0")]
+    [BepInPlugin(GUID, ModName, "1.1.0")]
     [BepInProcess("GTFO.exe")]
     public class WeaponStatShowerPlugin : BasePlugin
     {

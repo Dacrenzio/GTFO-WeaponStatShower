@@ -378,6 +378,10 @@ namespace WeaponStatShower.Utils
                 count++;
             }
 
+            builder.AppendLine("\n");
+
+            builder.Append(sleepersDatas.VerboseKill(archeTypeDataBlock));
+
             return builder.ToString();
         }
 

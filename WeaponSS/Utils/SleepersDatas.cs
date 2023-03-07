@@ -97,6 +97,53 @@ namespace WeaponStatShower.Utils
             return builder.ToString();
         }
 
+        internal string? VerboseKill(MeleeArchetypeDataBlock archeTypeDataBlock)
+        {
+            StringBuilder builder = new StringBuilder();
+            float damage = archeTypeDataBlock.ChargedAttackDamage * archeTypeDataBlock.ChargedSleeperMulti;
+            float prcsnMultiplier = archeTypeDataBlock.ChargedPrecisionMulti;
+            int count = 0;
+
+            for (int i = 0; i < EnemyDatas.Count; i++)
+            {
+                string enemyName = EnemyDatas.Keys.ElementAt(i);
+                if (enemyName.Contains("SCOUT"))
+                    damage /= archeTypeDataBlock.ChargedSleeperMulti;
+
+                List<char> killPlace = new List<char>();
+                float[] currEnemyDatas = EnemyDatas[enemyName];
+
+                if (canKillOnOccipit(damage, prcsnMultiplier, currEnemyDatas))
+                    killPlace.Add('o');
+
+                if (canKillOnHead(damage, prcsnMultiplier, currEnemyDatas))
+                    killPlace.Add('h');
+
+                if (canKillOnBack(damage, prcsnMultiplier, currEnemyDatas))
+                    killPlace.Add('b');
+
+                if (canKillOnChest(damage, currEnemyDatas))
+                    killPlace.Add('c');
+
+
+                if (killPlace.Count > 0)
+                {
+                    if (count % 2 == 1)
+                        builder.Append(" | ");
+
+                    killPlace.Reverse();
+                    builder.Append(enemyName + ": [" + string.Join(",", killPlace.ToArray()) + "]");
+
+                    if (count++ % 2 == 1 && i != EnemyDatas.Count - 1)
+                    {
+                        builder.Append('\n');
+                    }
+                }
+            }
+
+            return builder.ToString();
+        }
+
         private bool canKillOnChest(float damage, float[] currEnemyDatas)
         {
             if (isArmored(currEnemyDatas))
@@ -152,5 +199,7 @@ namespace WeaponStatShower.Utils
         {
             return currEnemyDatas[3] == 1f;
         }
+
+        
     }
 }
