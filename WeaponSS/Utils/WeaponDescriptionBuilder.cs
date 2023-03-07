@@ -9,47 +9,18 @@ namespace WeaponStatShower.Utils
 {
     internal class WeaponDescriptionBuilder
     {
-        private readonly Dictionary<string, float[]> EnemyDatas = new Dictionary<string, float[]>();
+        private SleepersDatas sleepersDatas;
         public PlayerDataBlock _playerDataBlock { get; set; }
         public GearIDRange idRange {  get; set; }
 
         public WeaponDescriptionBuilder(string[] activatedSleepers) 
         {
-            foreach(string monster in activatedSleepers)
+            if (activatedSleepers[0].Length == 0)
             {
-                switch (monster.ToUpper().Trim())
-                {
-                    case "ALL":
-                        EnemyDatas.TryAdd("STRK", new float[] { 20, 3, 2 });
-                        EnemyDatas.TryAdd("SHTR", new float[] { 30, 5, 2 });
-                        EnemyDatas.TryAdd("SCOUT", new float[] { 42, 3, 2 });
-                        EnemyDatas.TryAdd("B-STRK", new float[] { 120, 1.5F, 2 });
-                        EnemyDatas.TryAdd("B-SHTR", new float[] { 150, 2, 2 });
-                        EnemyDatas.TryAdd("CHRG", new float[] { 30, 1, 2 });
-                        break;
-                    case "STRIKER":
-                        EnemyDatas.TryAdd("STRK", new float[] { 20, 3, 2 });
-                        break;
-                    case "SHOOTER":
-                        EnemyDatas.TryAdd("SHTR", new float[] { 30, 5, 2 });
-                        break;
-                    case "SCOUT":
-                        EnemyDatas.TryAdd("SCOUT", new float[] { 42, 3, 2 });
-                        break;
-                    case "BIG_STRIKER":
-                        EnemyDatas.TryAdd("B-STRK", new float[] { 120, 1.5F, 2 });
-                        break;
-                    case "BIG_SHOOTER":
-                        EnemyDatas.TryAdd("B-SHTR", new float[] { 150, 2, 2 });
-                        break;
-                    case "CHARGER":
-                        EnemyDatas.TryAdd("CHRG", new float[] { 30, 1, 2 });
-                        break;
-                    default:
-                        WeaponStatShowerPlugin.LogWarning("You inserted an incorrect value in the config.");
-                        break;
-                }
+                WeaponStatShowerPlugin.LogWarning("Empty String in the config file, applying Default values");
+                activatedSleepers = new string[]{ "STRIKER", "SHOOTER", "SCOUT" };
             }
+            sleepersDatas = new SleepersDatas(activatedSleepers);
         }
 
         public string DescriptionFormatter(string GearDescription)
@@ -70,7 +41,7 @@ namespace WeaponStatShower.Utils
             {
                 eWeaponFireMode weaponFireMode = (eWeaponFireMode)idRange.GetCompID(eGearComponent.FireMode);
 
-                bool isSentryGun = categoryID == 12; // => PersistentID of the Sentry Gun Category
+                bool isSentryGun = categoryID == 12; // => PersistentID for Sentry Gun
 
                 ArchetypeDataBlock archetypeDataBlock = isSentryGun
                     ? SentryGunInstance_Firing_Bullets.GetArchetypeDataForFireMode(weaponFireMode)
@@ -83,7 +54,7 @@ namespace WeaponStatShower.Utils
         }
 
         private string VerboseDescriptionFormatter(ArchetypeDataBlock archetypeDataBlock, bool isSentryGun)
-        {//TODO: aggiungere solo descrizioni utili
+        {
             StringBuilder sb = new StringBuilder();
 
             if (isSentryGun)
@@ -256,7 +227,7 @@ namespace WeaponStatShower.Utils
 
             builder.AppendLine("\n");
 
-            builder.Append(GetKillList(archeTypeDataBlock, isShotgun));
+            builder.Append(sleepersDatas.VerboseKill(archeTypeDataBlock, isShotgun));
 
             return builder.ToString();
         }
@@ -443,52 +414,6 @@ namespace WeaponStatShower.Utils
             return maxBullets + archetypeDataBlock.DefaultClipSize;
         }
 
-        private string GetKillList(ArchetypeDataBlock archetypeDataBlock, bool isShotgun)
-        {
-            StringBuilder builder = new StringBuilder();
-            float damage = isShotgun ? archetypeDataBlock.Damage * archetypeDataBlock.ShotgunBulletCount : archetypeDataBlock.Damage;
-            int count = 0;
-
-            for(int i= 0; i < EnemyDatas.Count; i++)
-            {
-                string enemyName = EnemyDatas.Keys.ElementAt(i);
-                List<char> killPlace = new List<char>();
-                float[] currEnemyDatas = EnemyDatas[enemyName];
-                if (damage * currEnemyDatas[1] * currEnemyDatas[2] * archetypeDataBlock.PrecisionDamageMulti >= currEnemyDatas[0])
-                {
-                    killPlace.Add('o');
-                    if (damage * currEnemyDatas[1] >= currEnemyDatas[0])
-                    {
-                        killPlace.Add('h');
-                        if (damage * currEnemyDatas[2] >= currEnemyDatas[0])
-                        {
-                            killPlace.Add('b');
-                            if (damage > currEnemyDatas[0])
-                            {
-                                killPlace.Add('c');
-                            }
-                        }
-                    }
-                }
-
-                if (killPlace.Count > 0)
-                {
-                    killPlace.Reverse();
-                    builder.Append(enemyName + ": [" + string.Join(",", killPlace.ToArray()) + "]");
-
-                    if (count++ % 2 == 1 && i != EnemyDatas.Count - 1)
-                    {
-                        builder.Append('\n');
-                    }
-                    else if(i != EnemyDatas.Count - 1)
-                    {
-                        builder.Append(" "+ DIVIDER+ " ");
-                    }
-                }
-            }
-
-            return builder.ToString();
-        }
 
         public const string DIVIDER = " | ";
         public const string CLOSE_COLOR_TAG = "</color>";

@@ -42,7 +42,12 @@ namespace WeaponStatShower.Patches
 
         public static void CM_InventorySlotItem__LoadData__Postfix(CM_InventorySlotItem __instance, GearIDRange idRange, bool clickable, bool detailedInfo)
         {
-            if (__instance == null) return;
+            if (__instance == null || !detailedInfo) return;
+            if(_weaponDescriptionBuilder == null)
+            {
+                WeaponStatShowerPlugin.LogError("Something went wrong with the DescriptionBuilder");
+                return;
+            }
 
             _weaponDescriptionBuilder.idRange = idRange;
             _weaponDescriptionBuilder._playerDataBlock = PlayerDataBlock.GetBlock(1U);
