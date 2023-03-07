@@ -9,33 +9,41 @@ namespace WeaponStatShower.Utils
 {
     internal class WeaponDescriptionBuilder
     {
-
-        private PlayerDataBlock _playerDataBlock;
         private readonly Dictionary<string, float[]> EnemyDatas = new Dictionary<string, float[]>();
-        private GearIDRange idRange;
+        public PlayerDataBlock _playerDataBlock { get; set; }
+        public GearIDRange idRange {  get; set; }
 
-        public WeaponDescriptionBuilder(PlayerDataBlock _playerDataBlock, GearIDRange idRange, string[] activatedSleepers) 
+        public WeaponDescriptionBuilder(string[] activatedSleepers) 
         {
-            this._playerDataBlock = _playerDataBlock;
-            this.idRange = idRange;
-
             foreach(string monster in activatedSleepers)
             {
                 switch (monster.ToUpper().Trim())
                 {
                     case "ALL":
-                        EnemyDatas.TryAdd("STRIKER", new float[] { 20, 3, 2 });
-                        EnemyDatas.TryAdd("SHOOTER", new float[] { 30, 5, 2 });
+                        EnemyDatas.TryAdd("STRK", new float[] { 20, 3, 2 });
+                        EnemyDatas.TryAdd("SHTR", new float[] { 30, 5, 2 });
                         EnemyDatas.TryAdd("SCOUT", new float[] { 42, 3, 2 });
+                        EnemyDatas.TryAdd("B-STRK", new float[] { 120, 1.5F, 2 });
+                        EnemyDatas.TryAdd("B-SHTR", new float[] { 150, 2, 2 });
+                        EnemyDatas.TryAdd("CHRG", new float[] { 30, 1, 2 });
                         break;
                     case "STRIKER":
-                        EnemyDatas.TryAdd("STRIKER", new float[] { 20, 3, 2 });
+                        EnemyDatas.TryAdd("STRK", new float[] { 20, 3, 2 });
                         break;
                     case "SHOOTER":
-                        EnemyDatas.TryAdd("SHOOTER", new float[] { 30, 5, 2 });
+                        EnemyDatas.TryAdd("SHTR", new float[] { 30, 5, 2 });
                         break;
                     case "SCOUT":
                         EnemyDatas.TryAdd("SCOUT", new float[] { 42, 3, 2 });
+                        break;
+                    case "BIG_STRIKER":
+                        EnemyDatas.TryAdd("B-STRK", new float[] { 120, 1.5F, 2 });
+                        break;
+                    case "BIG_SHOOTER":
+                        EnemyDatas.TryAdd("B-SHTR", new float[] { 150, 2, 2 });
+                        break;
+                    case "CHARGER":
+                        EnemyDatas.TryAdd("CHRG", new float[] { 30, 1, 2 });
                         break;
                     default:
                         WeaponStatShowerPlugin.LogWarning("You inserted an incorrect value in the config.");

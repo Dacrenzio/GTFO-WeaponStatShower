@@ -16,7 +16,7 @@ namespace WeaponStatShower.Patches
         private static readonly ConfigDefinition ConfigEnabled = new(PatchName, "Enabled");
         private static readonly ConfigDefinition ConfigSleepers = new(PatchName, "SleepersShown");
         public override bool Enabled => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<bool>(ConfigEnabled).Value;
-        private static string ShownSleepers => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<string>(ConfigSleepers).Value;
+        private static string ShownSleepers => WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<string>(ConfigSleepers).Value.Trim();
         private static WeaponDescriptionBuilder? _weaponDescriptionBuilder;
 
 
@@ -27,7 +27,11 @@ namespace WeaponStatShower.Patches
 
             WeaponStatShowerPlugin.Instance.Config.Bind(ConfigEnabled, true, new ConfigDescription("Show the stats of a weapon."));
             WeaponStatShowerPlugin.Instance.Config.Bind<string>(ConfigSleepers, "STRIKER, SHOOTER, SCOUT",
-                new ConfigDescription("Select which Sleepers are shown, separeted by a comma.\n Acceptable values: ALL, STRIKER, SHOOTER, SCOUT"));
+                new ConfigDescription("Select which Sleepers are shown, separeted by a comma.\n"+
+                "Acceptable values: ALL, STRIKER, SHOOTER, SCOUT, BIG_STRIKER, BIG_SHOOTER, CHARGER"));
+
+            string[] sleepers = ShownSleepers.Split(',');
+            _weaponDescriptionBuilder = new WeaponDescriptionBuilder(sleepers);
         }
 
         public override void Execute()
@@ -40,11 +44,8 @@ namespace WeaponStatShower.Patches
         {
             if (__instance == null) return;
 
-            PlayerDataBlock _playerDataBlock = PlayerDataBlock.GetBlock(1U);
-
-            string[] sleepers = ShownSleepers.Trim().Split(',');
-
-            _weaponDescriptionBuilder = new WeaponDescriptionBuilder(_playerDataBlock, idRange, sleepers);
+            _weaponDescriptionBuilder.idRange = idRange;
+            _weaponDescriptionBuilder._playerDataBlock = PlayerDataBlock.GetBlock(1U);
 
             __instance.GearDescription = _weaponDescriptionBuilder.DescriptionFormatter(__instance.GearDescription);
         }
