@@ -181,7 +181,7 @@ namespace WeaponStatShower.Utils
 
             sb.Append(meleeArchetypeDataBlock.CanHitMultipleEnemies? "Piercing\n": "");
 
-            return sb.ToString();
+            return "".Equals(sb.ToString()) ? "" : sb.ToString() + "\n";
         }
 
         private string VerboseDescriptionFormatter(ArchetypeDataBlock archetypeDataBlock, bool isSentryGun)
@@ -219,7 +219,7 @@ namespace WeaponStatShower.Utils
                     "Long Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime, 2) + ")" :
                     "Short Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime, 2) + ")");
 
-            return sb.ToString()+"\n";
+            return "".Equals(sb.ToString())? "" : sb.ToString() + "\n";
         }
 
 
