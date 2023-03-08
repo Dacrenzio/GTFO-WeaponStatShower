@@ -92,25 +92,30 @@ namespace WeaponStatShower.Utils
             {
                 case eWeaponFireMode.Auto:
                 case eWeaponFireMode.SentryGunAuto:
-                    sb.AppendLine("Fully Automatic");
+                    sb.AppendLine("Fully Automatic (" + archetypeDataBlock.ShotDelay + ")");
                     break;
                 case eWeaponFireMode.Semi:
                 case eWeaponFireMode.SentryGunSemi:
-                    sb.AppendLine("Semi Automatic");
+                    sb.AppendLine("Semi Automatic ("+ archetypeDataBlock.ShotDelay +")");
                     break;
                 case eWeaponFireMode.Burst:
                 case eWeaponFireMode.SentryGunBurst:
                     if (archetypeDataBlock.BurstShotCount != 1)
                     {
-                        sb.AppendLine("Burst FireMode (" + archetypeDataBlock.BurstShotCount + ")");
+                        sb.Append("Burst FireMode (");
+                        sb.Append("#" + archetypeDataBlock.BurstShotCount);
+                        sb.Append(DIVIDER);
+                        sb.Append(FormatFloat(archetypeDataBlock.BurstDelay + (archetypeDataBlock.ShotDelay * archetypeDataBlock.BurstShotCount)));
+                        
+                        sb.AppendLine(")");
                     }
                     else
                     {
-                        sb.AppendLine("Semi Automatic");
+                        sb.AppendLine("Semi Automatic ("+ archetypeDataBlock.ShotDelay + ")");
                     }
                     break;
                 case eWeaponFireMode.SemiBurst:
-                    sb.AppendLine("SemiBurst FireMode");
+                    sb.AppendLine("SemiBurst FireMode ("+ archetypeDataBlock.BurstShotCount + DIVIDER + archetypeDataBlock.SpecialSemiBurstCountTimeout +")");
                     break;
                 case eWeaponFireMode.SentryGunShotgunSemi:
                     sb.AppendLine("Shotgun FireMode");
@@ -120,42 +125,26 @@ namespace WeaponStatShower.Utils
                     break;
             }
 
-            switch (archetypeDataBlock.RecoilDataID)
-            {
-                case 3U:
-                case 8U:
-                case 13U:
-                case 31U:
-                    sb.AppendLine("Balanced Recoil");
-                    break;
-                case 5U:
-                    sb.AppendLine("Heavy Recoil");
-                    break;
-                case 47:
-                case 48:
-                    sb.AppendLine("Hard to Control");
-                    break;
-                default:
-                    break;
-            }
-
-            switch (archetypeDataBlock.ShotgunBulletSpread)
+            switch (archetypeDataBlock.ShotgunBulletSpread + archetypeDataBlock.ShotgunConeSize)
             {
                 case 0: break;
                 case 1:
                     sb.AppendLine("Chocked Spread");
                     break;
-                case 2:
+                case 4:
                     sb.AppendLine("Small Spread");
                     break;
-                case 3:
+                case 5:
                     sb.AppendLine("Medium Spread");
                     break;
-                case 4:
+                case 7:
                     sb.AppendLine("Large Spread");
                     break;
+                case 9:
+                    sb.AppendLine("Huge Spread");
+                    break;
                 default:
-                    WeaponStatShowerPlugin.LogError(archetypeDataBlock.name + ": spread not considered: " + archetypeDataBlock.ShotgunBulletSpread);
+                    WeaponStatShowerPlugin.LogError(archetypeDataBlock.PublicName + ": spread not considered{" + archetypeDataBlock.ShotgunBulletSpread + "/" + archetypeDataBlock.ShotgunConeSize +"}");
                     break;
             }
 
@@ -164,7 +153,7 @@ namespace WeaponStatShower.Utils
                     "Long Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")" :
                     "Short Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")");
 
-            return sb.ToString();
+            return sb.ToString()+"\n";
         }
 
 
@@ -176,11 +165,10 @@ namespace WeaponStatShower.Utils
 
             StringBuilder builder = new StringBuilder();
 
-
-
             builder.Append("<#9D2929>");
             builder.Append($"{Short_Damage} ");
             builder.Append(FormatFloat(archeTypeDataBlock.Damage));
+            builder.Append(archeTypeDataBlock.ShotgunBulletCount > 0? "(x"+ archeTypeDataBlock.ShotgunBulletCount +")" : "");
             builder.Append(CLOSE_COLOR_TAG);
 
             if (!isSentryGun)
@@ -200,24 +188,6 @@ namespace WeaponStatShower.Utils
             builder.Append(GetTotalAmmo(archeTypeDataBlock, itemDataBlock, isSentryGun));
             builder.Append(CLOSE_COLOR_TAG);
 
-
-            if (archeTypeDataBlock.PrecisionDamageMulti != 1f)
-            {
-                builder.Append(DIVIDER);
-
-                builder.Append("<#18A4A9>");
-                builder.Append($"{Short_Precision} ");
-                builder.Append(FormatFloat(archeTypeDataBlock.PrecisionDamageMulti));
-                builder.Append(CLOSE_COLOR_TAG);
-            }
-
-            builder.Append(DIVIDER);
-
-            builder.Append("<#AAA8FF>");
-            builder.Append($"{Short_Falloff} ");
-            builder.Append(((int)archeTypeDataBlock.DamageFalloff.x).ToString() + "m");
-            builder.Append(CLOSE_COLOR_TAG);
-
             if (!isSentryGun)
             {
                 builder.Append(DIVIDER);
@@ -227,6 +197,26 @@ namespace WeaponStatShower.Utils
                 builder.Append(FormatFloat(archeTypeDataBlock.DefaultReloadTime));
                 builder.Append(CLOSE_COLOR_TAG);
             }
+
+            if (!isSentryGun)
+                builder.Append("\n");
+            else
+                builder.Append(DIVIDER);
+
+            if (archeTypeDataBlock.PrecisionDamageMulti != 1f)
+            {
+                builder.Append("<#18A4A9>");
+                builder.Append($"{Short_Precision} ");
+                builder.Append(FormatFloat(archeTypeDataBlock.PrecisionDamageMulti));
+                builder.Append(CLOSE_COLOR_TAG);
+                builder.Append(DIVIDER);
+            }
+
+
+            builder.Append("<#AAA8FF>");
+            builder.Append($"{Short_Falloff} ");
+            builder.Append(((int)archeTypeDataBlock.DamageFalloff.x).ToString() + "m");
+            builder.Append(CLOSE_COLOR_TAG);
 
 
             bool nonStandardStagger = archeTypeDataBlock.StaggerDamageMulti != 1f;
@@ -254,21 +244,9 @@ namespace WeaponStatShower.Utils
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
-            bool isShotgun = archeTypeDataBlock.ShotgunBulletCount > 0;
-
-            if (isShotgun)
-            {
-                builder.Append(DIVIDER);
-
-                builder.Append("<#55022B>");
-                builder.Append($"{Short_ShotgunPelletCount} ");
-                builder.Append(archeTypeDataBlock.ShotgunBulletCount);
-                builder.Append(CLOSE_COLOR_TAG);
-            }
-
             builder.AppendLine("\n");
 
-            builder.Append(sleepersDatas.VerboseKill(archeTypeDataBlock, isShotgun));
+            builder.Append(sleepersDatas.VerboseKill(archeTypeDataBlock));
 
             return builder.ToString();
         }

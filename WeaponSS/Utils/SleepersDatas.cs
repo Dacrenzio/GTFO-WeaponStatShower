@@ -53,10 +53,10 @@ namespace WeaponStatShower.Utils
             }
         }
 
-        public string VerboseKill(ArchetypeDataBlock archetypeDataBlock, bool isShotgun)
+        public string VerboseKill(ArchetypeDataBlock archetypeDataBlock)
         {
             StringBuilder builder = new StringBuilder();
-            float damage = isShotgun ? archetypeDataBlock.Damage * archetypeDataBlock.ShotgunBulletCount : archetypeDataBlock.Damage;
+            float damage = archetypeDataBlock.Damage * (archetypeDataBlock.ShotgunBulletCount > 0 ? archetypeDataBlock.ShotgunBulletCount : 1);
             float prcsnMultiplier = archetypeDataBlock.PrecisionDamageMulti;
             int count = 0;
 

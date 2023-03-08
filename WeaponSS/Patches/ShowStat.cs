@@ -2,6 +2,7 @@
 using CellMenu;
 using GameData;
 using Gear;
+using UnityEngine;
 using WeaponStatShower.Utils;
 
 namespace WeaponStatShower.Patches
