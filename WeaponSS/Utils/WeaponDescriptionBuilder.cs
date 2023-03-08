@@ -2,8 +2,6 @@
 using Gear;
 using Player;
 using System.Text;
-using static Il2CppSystem.Linq.Expressions.Interpreter.CastInstruction.CastInstructionNoT;
-
 
 namespace WeaponStatShower.Utils
 {
@@ -154,10 +152,7 @@ namespace WeaponStatShower.Utils
                     sb.Append("S-Burst (");
                     sb.Append("<#FFFFFF>");
                     sb.Append("#" + archetypeDataBlock.BurstShotCount);
-                    sb.Append(CLOSE_COLOR_TAG);
-                    sb.Append(DIVIDER);
-                    sb.Append("<#FFFFFF>");
-                    sb.Append("e " + archetypeDataBlock.SpecialSemiBurstCountTimeout + "\'");
+                    sb.Append("every " + archetypeDataBlock.SpecialSemiBurstCountTimeout + "\'");
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.AppendLine(")"); 
                     break;
@@ -221,8 +216,8 @@ namespace WeaponStatShower.Utils
 
             if (archetypeDataBlock.SpecialChargetupTime > 0)
                 sb.AppendLine(archetypeDataBlock.SpecialChargetupTime > 0.4 ?
-                    "Long Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")" :
-                    "Short Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime) + ")");
+                    "Long Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime, 2) + ")" :
+                    "Short Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime, 2) + ")");
 
             return sb.ToString()+"\n";
         }
@@ -238,7 +233,7 @@ namespace WeaponStatShower.Utils
 
             builder.Append("<#9D2929>");
             builder.Append($"{Short_Damage} ");
-            builder.Append(FormatFloat(archeTypeDataBlock.Damage));
+            builder.Append(FormatFloat(archeTypeDataBlock.Damage, 2));
             builder.Append(archeTypeDataBlock.ShotgunBulletCount > 0? "(x"+ archeTypeDataBlock.ShotgunBulletCount +")" : "");
             builder.Append(CLOSE_COLOR_TAG);
 
@@ -265,7 +260,7 @@ namespace WeaponStatShower.Utils
 
                 builder.Append("<#C0FF00>");
                 builder.Append($"{Short_Reload} ");
-                builder.Append(FormatFloat(archeTypeDataBlock.DefaultReloadTime));
+                builder.Append(FormatFloat(archeTypeDataBlock.DefaultReloadTime, 2));
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
@@ -278,7 +273,7 @@ namespace WeaponStatShower.Utils
             {
                 builder.Append("<#18A4A9>");
                 builder.Append($"{Short_Precision} ");
-                builder.Append(FormatFloat(archeTypeDataBlock.PrecisionDamageMulti));
+                builder.Append(FormatFloat(archeTypeDataBlock.PrecisionDamageMulti, 2));
                 builder.Append(CLOSE_COLOR_TAG);
                 builder.Append(DIVIDER);
             }
@@ -298,7 +293,7 @@ namespace WeaponStatShower.Utils
 
                 builder.Append("<color=green>");
                 builder.Append($"{Short_Stagger} ");
-                builder.Append(FormatFloat(archeTypeDataBlock.StaggerDamageMulti));
+                builder.Append(FormatFloat(archeTypeDataBlock.StaggerDamageMulti, 2));
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
@@ -459,9 +454,9 @@ namespace WeaponStatShower.Utils
             return builder.ToString();
         }
 
-        private static float FormatFloat(float value)
+        private static float FormatFloat(float value, int v)
         {
-            return (float)Math.Round((decimal)value, 2);
+            return (float)Math.Round((decimal)value, v);
         }
 
 
@@ -510,41 +505,24 @@ namespace WeaponStatShower.Utils
 
         private string GetRateOfFire(ArchetypeDataBlock archetypeDataBlock)
         {
-            bool isNotExact = true;
-            int value = -1;
+            float value = -1F;
 
             switch (archetypeDataBlock.FireMode)
             {
+                case eWeaponFireMode.SentryGunShotgunSemi:
                 case eWeaponFireMode.Auto:
                 case eWeaponFireMode.Semi:
-                    isNotExact = (1 / archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime) % 1 > 0;
-                    value = (int)((1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime)) + (isNotExact ? 1 : 0));
+                    value = 1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime);
                     break;
-
-                case eWeaponFireMode.Burst:
-                    float shootsPerSecond = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * archetypeDataBlock.BurstShotCount));
-                    isNotExact = shootsPerSecond % 1 > 0;
-                    value = (int)((shootsPerSecond) + (isNotExact ? 1:0)) * archetypeDataBlock.BurstShotCount;
-                    break;
-
-                case eWeaponFireMode.SentryGunShotgunSemi:
-                    isNotExact = (1 / archetypeDataBlock.ShotDelay) % 1 > 0;
-                    value = (int)((1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime)) + (isNotExact ? 1 : 0));
-
-                    return (isNotExact ? "~" : "") + value;
 
                 case eWeaponFireMode.SentryGunBurst:
-                    float shootsPerSecondSB = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * archetypeDataBlock.BurstShotCount));
-                    isNotExact = shootsPerSecondSB % 1 > 0;
-                    value = (int)((shootsPerSecondSB) + (isNotExact ? 1 : 0)) * archetypeDataBlock.BurstShotCount;
-
-                    return (isNotExact ? "~" : "") + value;
+                case eWeaponFireMode.Burst:
+                    float shootsPerSecondSB = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * (archetypeDataBlock.BurstShotCount -1) ));
+                    value = (shootsPerSecondSB) * archetypeDataBlock.BurstShotCount;
+                    break;
             }
 
-            if (value > archetypeDataBlock.DefaultClipSize)
-                return archetypeDataBlock.DefaultClipSize.ToString();
-
-            return (isNotExact ? "~" : "") + value;
+            return FormatFloat(value, 1).ToString();
         }
 
         internal void Inizialize(GearIDRange idRange, PlayerDataBlock playerDataBlock)
