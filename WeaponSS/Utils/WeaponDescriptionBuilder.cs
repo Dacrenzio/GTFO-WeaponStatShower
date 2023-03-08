@@ -152,7 +152,7 @@ namespace WeaponStatShower.Utils
                     sb.Append("S-Burst (");
                     sb.Append("<#FFFFFF>");
                     sb.Append("#" + archetypeDataBlock.BurstShotCount);
-                    sb.Append("every " + archetypeDataBlock.SpecialSemiBurstCountTimeout + "\'");
+                    sb.Append(" every " + archetypeDataBlock.SpecialSemiBurstCountTimeout + "\'");
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.AppendLine(")"); 
                     break;
@@ -517,8 +517,15 @@ namespace WeaponStatShower.Utils
 
                 case eWeaponFireMode.SentryGunBurst:
                 case eWeaponFireMode.Burst:
-                    float shootsPerSecondSB = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * (archetypeDataBlock.BurstShotCount -1) ));
-                    value = (shootsPerSecondSB) * archetypeDataBlock.BurstShotCount;
+                    if(archetypeDataBlock.BurstShotCount != 1)
+                    {
+                        float shootsPerSecondSB = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * (archetypeDataBlock.BurstShotCount -1)));
+                        value = (shootsPerSecondSB) * archetypeDataBlock.BurstShotCount;
+                    }
+                    else
+                    {
+                        value = 1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime);
+                    }
                     break;
             }
 
