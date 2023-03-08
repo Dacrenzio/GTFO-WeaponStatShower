@@ -104,8 +104,8 @@ namespace WeaponStatShower.Utils
                 case eWeaponFireMode.SentryGunAuto:
 
                     sb.Append("Full-A (");
-                    sb.Append("<#FFFFFF>");
-                    sb.Append(Short_RateOfFire + ": ");
+                    sb.Append("<#12FF50>");
+                    sb.Append(Short_RateOfFire + " ");
                     sb.Append(GetRateOfFire(archetypeDataBlock));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.AppendLine(")"); 
@@ -115,8 +115,8 @@ namespace WeaponStatShower.Utils
                 case eWeaponFireMode.SentryGunSemi:
 
                     sb.Append("Semi-A (");
-                    sb.Append("<#FFFFFF>");
-                    sb.Append(Short_RateOfFire + ": ");
+                    sb.Append("<#12FF50>");
+                    sb.Append(Short_RateOfFire + " ");
                     sb.Append(GetRateOfFire(archetypeDataBlock));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.AppendLine(")");
@@ -127,12 +127,12 @@ namespace WeaponStatShower.Utils
                     if (archetypeDataBlock.BurstShotCount != 1)
                     {
                         sb.Append("Burst (");
-                        sb.Append("<#FFFFFF>");
+                        sb.Append("<#1212FA>");
                         sb.Append("#" + archetypeDataBlock.BurstShotCount);
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(DIVIDER);
-                        sb.Append("<#FFFFFF>");
-                        sb.Append(Short_RateOfFire + ": ");
+                        sb.Append("<#12FF50>");
+                        sb.Append(Short_RateOfFire + " ");
                         sb.Append(GetRateOfFire(archetypeDataBlock));
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.AppendLine(")");
@@ -140,8 +140,8 @@ namespace WeaponStatShower.Utils
                     else
                     {
                         sb.Append("Semi-A (");
-                        sb.Append("<#FFFFFF>");
-                        sb.Append(Short_RateOfFire + ": ");
+                        sb.Append("<#12FF50>");
+                        sb.Append(Short_RateOfFire + " ");
                         sb.Append(GetRateOfFire(archetypeDataBlock));
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.AppendLine(")");
@@ -150,7 +150,7 @@ namespace WeaponStatShower.Utils
                     break;
                 case eWeaponFireMode.SemiBurst:
                     sb.Append("S-Burst (");
-                    sb.Append("<#FFFFFF>");
+                    sb.Append("<#12FF50>");
                     sb.Append("#" + archetypeDataBlock.BurstShotCount);
                     sb.Append(" every " + archetypeDataBlock.SpecialSemiBurstCountTimeout + "\'");
                     sb.Append(CLOSE_COLOR_TAG);
@@ -159,8 +159,8 @@ namespace WeaponStatShower.Utils
 
                 case eWeaponFireMode.SentryGunShotgunSemi:
                     sb.Append("Shotgun-S (");
-                    sb.Append("<#FFFFFF>");
-                    sb.Append(Short_RateOfFire + ": ");
+                    sb.Append("<#12FF50>");
+                    sb.Append(Short_RateOfFire + " ");
                     sb.Append(GetRateOfFire(archetypeDataBlock));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.AppendLine(")");
