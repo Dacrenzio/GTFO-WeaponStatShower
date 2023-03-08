@@ -51,7 +51,7 @@ namespace WeaponStatShower.Utils
 
                 GearDescription = VerboseDescriptionFormatter(archetypeDataBlock, isSentryGun);
 
-                return GearDescription + GetFormatedWeaponStats(archetypeDataBlock, itemDataBlock, isSentryGun);
+                return GearDescription + GetFormatedWeaponStats(archetypeDataBlock, isSentryGun);
             }
         }
 
@@ -225,7 +225,7 @@ namespace WeaponStatShower.Utils
 
 
 
-        private string GetFormatedWeaponStats(ArchetypeDataBlock archeTypeDataBlock, ItemDataBlock itemDataBlock, bool isSentryGun = false)
+        private string GetFormatedWeaponStats(ArchetypeDataBlock archeTypeDataBlock, bool isSentryGun = false)
         {
             if (archeTypeDataBlock == null) return string.Empty;
 
@@ -294,6 +294,30 @@ namespace WeaponStatShower.Utils
                 builder.Append("<color=green>");
                 builder.Append($"{Short_Stagger} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.StaggerDamageMulti, 2));
+                builder.Append(CLOSE_COLOR_TAG);
+            }
+
+            bool nonStandardHip = archeTypeDataBlock.HipFireSpread != 1f;
+
+            if (nonStandardHip)
+            {
+                builder.Append(DIVIDER);
+
+                builder.Append("<#FFFFFF>");
+                builder.Append($"{Short_HipSpread} ");
+                builder.Append(FormatFloat(archeTypeDataBlock.HipFireSpread, 2));
+                builder.Append(CLOSE_COLOR_TAG);
+            }
+
+            bool nonStandardADS = archeTypeDataBlock.AimSpread != 0f;
+
+            if (nonStandardADS)
+            {
+                builder.Append(DIVIDER);
+
+                builder.Append("<#FFFFFF>");
+                builder.Append($"{Short_AimSpread} ");
+                builder.Append(FormatFloat(archeTypeDataBlock.AimSpread, 2));
                 builder.Append(CLOSE_COLOR_TAG);
             }
 
@@ -564,5 +588,7 @@ namespace WeaponStatShower.Utils
         private static string Short_Precision { get; } = "Prcsn";
         private static string Short_PierceCount { get; } = "Pierc";
         private static string Short_RateOfFire { get; } = "RoF";
+        private static string Short_AimSpread { get; } = "ADS";
+        private static string Short_HipSpread { get; } = "HIP";
     }
 }
