@@ -92,11 +92,11 @@ namespace WeaponStatShower.Utils
             {
                 case eWeaponFireMode.Auto:
                 case eWeaponFireMode.SentryGunAuto:
-                    sb.AppendLine("Fully Automatic (" + archetypeDataBlock.ShotDelay + ")");
+                    sb.AppendLine("Fully Automatic (" + GetRateOfFire(archetypeDataBlock) + ")");
                     break;
                 case eWeaponFireMode.Semi:
                 case eWeaponFireMode.SentryGunSemi:
-                    sb.AppendLine("Semi Automatic ("+ archetypeDataBlock.ShotDelay +")");
+                    sb.AppendLine("Semi Automatic (" + GetRateOfFire(archetypeDataBlock) + ")");
                     break;
                 case eWeaponFireMode.Burst:
                 case eWeaponFireMode.SentryGunBurst:
@@ -105,20 +105,20 @@ namespace WeaponStatShower.Utils
                         sb.Append("Burst FireMode (");
                         sb.Append("#" + archetypeDataBlock.BurstShotCount);
                         sb.Append(DIVIDER);
-                        sb.Append(FormatFloat(archetypeDataBlock.BurstDelay + (archetypeDataBlock.ShotDelay * archetypeDataBlock.BurstShotCount)));
+                        sb.Append(GetRateOfFire(archetypeDataBlock));
                         
                         sb.AppendLine(")");
                     }
                     else
                     {
-                        sb.AppendLine("Semi Automatic ("+ archetypeDataBlock.ShotDelay + ")");
+                        sb.AppendLine("Semi Automatic ("+ GetRateOfFire(archetypeDataBlock) + ")");
                     }
                     break;
                 case eWeaponFireMode.SemiBurst:
-                    sb.AppendLine("SemiBurst FireMode ("+ archetypeDataBlock.BurstShotCount + DIVIDER + archetypeDataBlock.SpecialSemiBurstCountTimeout +")");
+                    sb.AppendLine("SemiBurst FireMode (#"+ archetypeDataBlock.BurstShotCount + DIVIDER + archetypeDataBlock.SpecialSemiBurstCountTimeout +")");
                     break;
                 case eWeaponFireMode.SentryGunShotgunSemi:
-                    sb.AppendLine("Shotgun FireMode");
+                    sb.AppendLine("Shotgun FireMode (" + GetRateOfFire(archetypeDataBlock));
                     break;
                 default:
                     WeaponStatShowerPlugin.LogError("FireMode not found");
@@ -435,6 +435,46 @@ namespace WeaponStatShower.Utils
                 return maxBullets;
 
             return maxBullets + archetypeDataBlock.DefaultClipSize;
+        }
+
+        private string GetRateOfFire(ArchetypeDataBlock archetypeDataBlock)
+        {
+
+            switch (archetypeDataBlock.FireMode)
+            {
+                case eWeaponFireMode.Auto:
+                case eWeaponFireMode.Semi:
+                    bool isNotExactA = (1 / archetypeDataBlock.ShotDelay) % 1 > 0;
+                    int valueA = (int)((1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime)) + (isNotExactA ? 1 : 0));
+                    
+                    if (valueA > archetypeDataBlock.DefaultClipSize) 
+                        return archetypeDataBlock.DefaultClipSize.ToString();
+
+                    return (isNotExactA ? "~" : "") + valueA;
+
+                case eWeaponFireMode.Burst:
+                    float shootsPerSecond = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * archetypeDataBlock.BurstShotCount));
+                    bool isNotExactB = shootsPerSecond % 1 > 0;
+                    int valueB = (int)((shootsPerSecond) + (isNotExactB ? 1:0)) * archetypeDataBlock.BurstShotCount;
+
+                    if(valueB > archetypeDataBlock.DefaultClipSize) return archetypeDataBlock.DefaultClipSize.ToString();
+
+                    return (isNotExactB ? "~" : "") + valueB;
+
+                case eWeaponFireMode.SentryGunShotgunSemi:
+                    bool isNotExactSS = (1 / archetypeDataBlock.ShotDelay) % 1 > 0;
+                    int valueS = (int)((1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime)) + (isNotExactSS ? 1 : 0));
+
+                    return (isNotExactSS ? "~" : "") + valueS;
+
+                case eWeaponFireMode.SentryGunBurst:
+                    float shootsPerSecondSB = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * archetypeDataBlock.BurstShotCount));
+                    bool isNotExactSB = shootsPerSecondSB % 1 > 0;
+                    int valueSB = (int)((shootsPerSecondSB) + (isNotExactSB ? 1 : 0)) * archetypeDataBlock.BurstShotCount;
+
+                    return (isNotExactSB ? "~" : "") + valueSB;
+            }
+            return "Err";
         }
 
 
