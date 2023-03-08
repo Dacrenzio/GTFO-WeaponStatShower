@@ -62,7 +62,7 @@ namespace WeaponStatShower.Patches
             _weaponDescriptionBuilder.idRange = idRange;
             _weaponDescriptionBuilder._playerDataBlock = PlayerDataBlock.GetBlock(1U);
 
-            __instance.GearDescription = _weaponDescriptionBuilder.DescriptionFormatter(__instance.GearDescription);
+            __instance.GearDescription = _weaponDescriptionBuilder.DescriptionFormatter(__instance.GearDescription, __instance.);
         }
     }
 }

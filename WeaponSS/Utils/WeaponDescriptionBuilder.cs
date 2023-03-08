@@ -57,23 +57,60 @@ namespace WeaponStatShower.Utils
             }
         }
 
-        private string VerboseDescriptionFormatter(MeleeArchetypeDataBlock meleeArchetypeDataBlock)
+        internal string FireRateFormatter(string gearPublicName)
         {
-            StringBuilder sb = new StringBuilder();
+            uint categoryID = idRange.GetCompID(eGearComponent.Category);
 
+            GearCategoryDataBlock gearCatBlock = GameDataBlockBase<GearCategoryDataBlock>.GetBlock(categoryID);
+
+            ItemDataBlock itemDataBlock = ItemDataBlock.GetBlock(gearCatBlock.BaseItem);
+
+            if (itemDataBlock.inventorySlot == InventorySlot.GearMelee)
+            {
+                MeleeArchetypeDataBlock meleeArchetypeDataBlock = MeleeArchetypeDataBlock.GetBlock(GearBuilder.GetMeleeArchetypeID(gearCatBlock));
+                return VerbosePublicNameMelee(meleeArchetypeDataBlock);
+            }
+            else
+            {
+                eWeaponFireMode weaponFireMode = (eWeaponFireMode)idRange.GetCompID(eGearComponent.FireMode);
+
+                bool isSentryGun = categoryID == 12; // => PersistentID for Sentry Gun
+
+                ArchetypeDataBlock archetypeDataBlock = isSentryGun
+                    ? SentryGunInstance_Firing_Bullets.GetArchetypeDataForFireMode(weaponFireMode)
+                    : ArchetypeDataBlock.GetBlock(GearBuilder.GetArchetypeID(gearCatBlock, weaponFireMode));
+
+                if (archetypeDataBlock == null) return gearPublicName; //case of non-weapon tools such as BIO_TRACKER/MINE_DEPLOYER
+
+                return VerbosePublicNameFireMode(archetypeDataBlock);
+            }
+        }
+
+        private string VerbosePublicNameMelee(MeleeArchetypeDataBlock meleeArchetypeDataBlock)
+        {
             switch (meleeArchetypeDataBlock.persistentID)
             {
                 case 1:
-                    sb.AppendLine("Balanced");
-                    break;
+                    return "Hammer - Balanced";
                 case 2:
+                    return "Knife - Fast";
                 case 4:
-                    sb.AppendLine("Fast");
-                    break;
+                    return "Mace - Fast";
                 case 3:
-                    sb.AppendLine("Slow");
-                    break;
+                    return "Spear - Slow";
+                default:
+                    return "";
             }
+        }
+
+        private string VerbosePublicNameFireMode(ArchetypeDataBlock archetypeDataBlock)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string VerboseDescriptionFormatter(MeleeArchetypeDataBlock meleeArchetypeDataBlock)
+        {
+            StringBuilder sb = new StringBuilder();
 
             sb.AppendLine(meleeArchetypeDataBlock.CameraDamageRayLength < 1.76?"Short Range": meleeArchetypeDataBlock.CameraDamageRayLength < 3? "Medium Range" : "Long Range");
 
@@ -477,6 +514,7 @@ namespace WeaponStatShower.Utils
             return (isNotExact ? "~" : "") + value;
         }
 
+        
 
         public const string DIVIDER = " | ";
         public const string CLOSE_COLOR_TAG = "</color>";
