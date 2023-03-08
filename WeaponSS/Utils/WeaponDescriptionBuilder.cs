@@ -10,8 +10,13 @@ namespace WeaponStatShower.Utils
     internal class WeaponDescriptionBuilder
     {
         private SleepersDatas sleepersDatas;
-        public PlayerDataBlock _playerDataBlock { get; set; }
-        public GearIDRange idRange { get; set; }
+        private PlayerDataBlock _playerDataBlock { get; set; }
+        private GearIDRange idRange { get; set; }
+
+        private uint categoryID;
+        private GearCategoryDataBlock gearCatBlock;
+        private ItemDataBlock itemDataBlock;
+
 
         public void UpdateSleepersDatas(string[] activatedSleepers)
         {
@@ -25,11 +30,6 @@ namespace WeaponStatShower.Utils
 
         public string DescriptionFormatter(string GearDescription)
         {
-            uint categoryID = idRange.GetCompID(eGearComponent.Category);
-
-            GearCategoryDataBlock gearCatBlock = GameDataBlockBase<GearCategoryDataBlock>.GetBlock(categoryID);
-
-            ItemDataBlock itemDataBlock = ItemDataBlock.GetBlock(gearCatBlock.BaseItem);
 
             if (itemDataBlock.inventorySlot == InventorySlot.GearMelee)
             {
@@ -59,12 +59,6 @@ namespace WeaponStatShower.Utils
 
         internal string FireRateFormatter(string gearPublicName)
         {
-            uint categoryID = idRange.GetCompID(eGearComponent.Category);
-
-            GearCategoryDataBlock gearCatBlock = GameDataBlockBase<GearCategoryDataBlock>.GetBlock(categoryID);
-
-            ItemDataBlock itemDataBlock = ItemDataBlock.GetBlock(gearCatBlock.BaseItem);
-
             if (itemDataBlock.inventorySlot == InventorySlot.GearMelee)
             {
                 MeleeArchetypeDataBlock meleeArchetypeDataBlock = MeleeArchetypeDataBlock.GetBlock(GearBuilder.GetMeleeArchetypeID(gearCatBlock));
@@ -95,7 +89,7 @@ namespace WeaponStatShower.Utils
                 case 2:
                     return "Knife - Fast";
                 case 4:
-                    return "Mace - Fast";
+                    return "Bat - Fast";
                 case 3:
                     return "Spear - Slow";
                 default:
@@ -105,14 +99,90 @@ namespace WeaponStatShower.Utils
 
         private string VerbosePublicNameFireMode(ArchetypeDataBlock archetypeDataBlock)
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+            switch (archetypeDataBlock.FireMode)
+            {
+                case eWeaponFireMode.Auto:
+                case eWeaponFireMode.SentryGunAuto:
+
+                    sb.Append("Full-A (");
+                    sb.Append("<#FFFFFF>");
+                    sb.Append(Short_RateOfFire + ": ");
+                    sb.Append(GetRateOfFire(archetypeDataBlock));
+                    sb.Append(CLOSE_COLOR_TAG);
+                    sb.AppendLine(")"); 
+                    break;
+
+                case eWeaponFireMode.Semi:
+                case eWeaponFireMode.SentryGunSemi:
+
+                    sb.Append("Semi-A (");
+                    sb.Append("<#FFFFFF>");
+                    sb.Append(Short_RateOfFire + ": ");
+                    sb.Append(GetRateOfFire(archetypeDataBlock));
+                    sb.Append(CLOSE_COLOR_TAG);
+                    sb.AppendLine(")");
+                    break;
+
+                case eWeaponFireMode.Burst:
+                case eWeaponFireMode.SentryGunBurst:
+                    if (archetypeDataBlock.BurstShotCount != 1)
+                    {
+                        sb.Append("Burst (");
+                        sb.Append("<#FFFFFF>");
+                        sb.Append("#" + archetypeDataBlock.BurstShotCount);
+                        sb.Append(CLOSE_COLOR_TAG);
+                        sb.Append(DIVIDER);
+                        sb.Append("<#FFFFFF>");
+                        sb.Append(Short_RateOfFire + ": ");
+                        sb.Append(GetRateOfFire(archetypeDataBlock));
+                        sb.Append(CLOSE_COLOR_TAG);
+                        sb.AppendLine(")");
+                    }
+                    else
+                    {
+                        sb.Append("Semi-A (");
+                        sb.Append("<#FFFFFF>");
+                        sb.Append(Short_RateOfFire + ": ");
+                        sb.Append(GetRateOfFire(archetypeDataBlock));
+                        sb.Append(CLOSE_COLOR_TAG);
+                        sb.AppendLine(")");
+                        break;
+                    }
+                    break;
+                case eWeaponFireMode.SemiBurst:
+                    sb.Append("S-Burst (");
+                    sb.Append("<#FFFFFF>");
+                    sb.Append("#" + archetypeDataBlock.BurstShotCount);
+                    sb.Append(CLOSE_COLOR_TAG);
+                    sb.Append(DIVIDER);
+                    sb.Append("<#FFFFFF>");
+                    sb.Append("e " + archetypeDataBlock.SpecialSemiBurstCountTimeout + "\'");
+                    sb.Append(CLOSE_COLOR_TAG);
+                    sb.AppendLine(")"); 
+                    break;
+
+                case eWeaponFireMode.SentryGunShotgunSemi:
+                    sb.Append("Shotgun-S (");
+                    sb.Append("<#FFFFFF>");
+                    sb.Append(Short_RateOfFire + ": ");
+                    sb.Append(GetRateOfFire(archetypeDataBlock));
+                    sb.Append(CLOSE_COLOR_TAG);
+                    sb.AppendLine(")");
+                    break;
+                default:
+                    WeaponStatShowerPlugin.LogError("FireMode not found");
+                    break;
+            }
+
+            return sb.ToString();
         }
 
         private string VerboseDescriptionFormatter(MeleeArchetypeDataBlock meleeArchetypeDataBlock)
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(meleeArchetypeDataBlock.CameraDamageRayLength < 1.76?"Short Range": meleeArchetypeDataBlock.CameraDamageRayLength < 3? "Medium Range" : "Long Range");
+            sb.AppendLine(meleeArchetypeDataBlock.CameraDamageRayLength < 1.76 ? "Short Range" : meleeArchetypeDataBlock.CameraDamageRayLength < 2.5 ? "Medium Range" : "Long Range");
 
             sb.Append(meleeArchetypeDataBlock.CanHitMultipleEnemies? "Piercing\n": "");
 
@@ -125,43 +195,6 @@ namespace WeaponStatShower.Utils
 
             if (isSentryGun)
                 sb.AppendLine("Deployable");
-
-            switch (archetypeDataBlock.FireMode)
-            {
-                case eWeaponFireMode.Auto:
-                case eWeaponFireMode.SentryGunAuto:
-                    sb.AppendLine("Fully Automatic (" + GetRateOfFire(archetypeDataBlock) + ")");
-                    break;
-                case eWeaponFireMode.Semi:
-                case eWeaponFireMode.SentryGunSemi:
-                    sb.AppendLine("Semi Automatic (" + GetRateOfFire(archetypeDataBlock) + ")");
-                    break;
-                case eWeaponFireMode.Burst:
-                case eWeaponFireMode.SentryGunBurst:
-                    if (archetypeDataBlock.BurstShotCount != 1)
-                    {
-                        sb.Append("Burst FireMode (");
-                        sb.Append("#" + archetypeDataBlock.BurstShotCount);
-                        sb.Append(DIVIDER);
-                        sb.Append(GetRateOfFire(archetypeDataBlock));
-                        
-                        sb.AppendLine(")");
-                    }
-                    else
-                    {
-                        sb.AppendLine("Semi Automatic ("+ GetRateOfFire(archetypeDataBlock) + ")");
-                    }
-                    break;
-                case eWeaponFireMode.SemiBurst:
-                    sb.AppendLine("SemiBurst FireMode (#"+ archetypeDataBlock.BurstShotCount + DIVIDER + archetypeDataBlock.SpecialSemiBurstCountTimeout +")");
-                    break;
-                case eWeaponFireMode.SentryGunShotgunSemi:
-                    sb.AppendLine("Shotgun FireMode (" + GetRateOfFire(archetypeDataBlock));
-                    break;
-                default:
-                    WeaponStatShowerPlugin.LogError("FireMode not found");
-                    break;
-            }
 
             switch (archetypeDataBlock.ShotgunBulletSpread + archetypeDataBlock.ShotgunConeSize)
             {
@@ -514,26 +547,37 @@ namespace WeaponStatShower.Utils
             return (isNotExact ? "~" : "") + value;
         }
 
-        
+        internal void Inizialize(GearIDRange idRange, PlayerDataBlock playerDataBlock)
+        {
+            this.idRange = idRange;
 
-        public const string DIVIDER = " | ";
-        public const string CLOSE_COLOR_TAG = "</color>";
+            _playerDataBlock = playerDataBlock;
 
-        public static string Short_MeleeLight { get; } = ".Lgt";
-        public static string Short_MeleeCharged { get; } = ".Hvy";
+            categoryID = idRange.GetCompID(eGearComponent.Category);
 
-        public static string Short_MeleeCanRunWhileCharging { get; } = "Run";
-        public static string Short_MeleeSleepingEnemiesMultiplier { get; } = "Slp";
-        public static string Short_EnvironmentMultiplier { get; } = "Env";
+            gearCatBlock = GameDataBlockBase<GearCategoryDataBlock>.GetBlock(categoryID);
 
-        public static string Short_Damage { get; } = "Dmg";
-        public static string Short_Clip { get; } = "Clp";
-        public static string Short_MaxAmmo { get; } = "Max";
-        public static string Short_Falloff { get; } = "Dist";
-        public static string Short_Reload { get; } = "Rld";
-        public static string Short_Stagger { get; } = "Stgr";
-        public static string Short_Precision { get; } = "Prcsn";
-        public static string Short_PierceCount { get; } = "Pierc";
-        public static string Short_ShotgunPelletCount { get; } = "Pelts";
+            itemDataBlock = ItemDataBlock.GetBlock(gearCatBlock.BaseItem);
+        }
+
+        private const string DIVIDER = " | ";
+        private const string CLOSE_COLOR_TAG = "</color>";
+
+        private static string Short_MeleeLight { get; } = ".Lgt";
+        private static string Short_MeleeCharged { get; } = ".Hvy";
+
+        private static string Short_MeleeCanRunWhileCharging { get; } = "Run";
+        private static string Short_MeleeSleepingEnemiesMultiplier { get; } = "Slp";
+        private static string Short_EnvironmentMultiplier { get; } = "Env";
+
+        private static string Short_Damage { get; } = "Dmg";
+        private static string Short_Clip { get; } = "Clp";
+        private static string Short_MaxAmmo { get; } = "Max";
+        private static string Short_Falloff { get; } = "Dist";
+        private static string Short_Reload { get; } = "Rld";
+        private static string Short_Stagger { get; } = "Stgr";
+        private static string Short_Precision { get; } = "Prcsn";
+        private static string Short_PierceCount { get; } = "Pierc";
+        private static string Short_RateOfFire { get; } = "RoF";
     }
 }

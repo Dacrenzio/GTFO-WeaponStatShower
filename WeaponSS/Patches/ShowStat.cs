@@ -59,10 +59,10 @@ namespace WeaponStatShower.Patches
                 PrevShownSleepers = CurrShownSleepers;
             }
 
-            _weaponDescriptionBuilder.idRange = idRange;
-            _weaponDescriptionBuilder._playerDataBlock = PlayerDataBlock.GetBlock(1U);
+            _weaponDescriptionBuilder.Inizialize(idRange, PlayerDataBlock.GetBlock(1U));
 
-            __instance.GearDescription = _weaponDescriptionBuilder.DescriptionFormatter(__instance.GearDescription, __instance.);
+            __instance.GearDescription = _weaponDescriptionBuilder.DescriptionFormatter(__instance.GearDescription);
+            __instance.GearPublicName = _weaponDescriptionBuilder.FireRateFormatter(__instance.GearPublicName);
         }
     }
 }
