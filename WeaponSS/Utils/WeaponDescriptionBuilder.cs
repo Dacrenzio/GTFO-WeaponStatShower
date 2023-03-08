@@ -2,6 +2,7 @@
 using Gear;
 using Player;
 using System.Text;
+using static Il2CppSystem.Linq.Expressions.Interpreter.CastInstruction.CastInstructionNoT;
 
 
 namespace WeaponStatShower.Utils
@@ -439,42 +440,41 @@ namespace WeaponStatShower.Utils
 
         private string GetRateOfFire(ArchetypeDataBlock archetypeDataBlock)
         {
+            bool isNotExact = true;
+            int value = -1;
 
             switch (archetypeDataBlock.FireMode)
             {
                 case eWeaponFireMode.Auto:
                 case eWeaponFireMode.Semi:
-                    bool isNotExactA = (1 / archetypeDataBlock.ShotDelay) % 1 > 0;
-                    int valueA = (int)((1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime)) + (isNotExactA ? 1 : 0));
-                    
-                    if (valueA > archetypeDataBlock.DefaultClipSize) 
-                        return archetypeDataBlock.DefaultClipSize.ToString();
-
-                    return (isNotExactA ? "~" : "") + valueA;
+                    isNotExact = (1 / archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime) % 1 > 0;
+                    value = (int)((1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime)) + (isNotExact ? 1 : 0));
+                    break;
 
                 case eWeaponFireMode.Burst:
                     float shootsPerSecond = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * archetypeDataBlock.BurstShotCount));
-                    bool isNotExactB = shootsPerSecond % 1 > 0;
-                    int valueB = (int)((shootsPerSecond) + (isNotExactB ? 1:0)) * archetypeDataBlock.BurstShotCount;
-
-                    if(valueB > archetypeDataBlock.DefaultClipSize) return archetypeDataBlock.DefaultClipSize.ToString();
-
-                    return (isNotExactB ? "~" : "") + valueB;
+                    isNotExact = shootsPerSecond % 1 > 0;
+                    value = (int)((shootsPerSecond) + (isNotExact ? 1:0)) * archetypeDataBlock.BurstShotCount;
+                    break;
 
                 case eWeaponFireMode.SentryGunShotgunSemi:
-                    bool isNotExactSS = (1 / archetypeDataBlock.ShotDelay) % 1 > 0;
-                    int valueS = (int)((1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime)) + (isNotExactSS ? 1 : 0));
+                    isNotExact = (1 / archetypeDataBlock.ShotDelay) % 1 > 0;
+                    value = (int)((1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime)) + (isNotExact ? 1 : 0));
 
-                    return (isNotExactSS ? "~" : "") + valueS;
+                    return (isNotExact ? "~" : "") + value;
 
                 case eWeaponFireMode.SentryGunBurst:
                     float shootsPerSecondSB = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * archetypeDataBlock.BurstShotCount));
-                    bool isNotExactSB = shootsPerSecondSB % 1 > 0;
-                    int valueSB = (int)((shootsPerSecondSB) + (isNotExactSB ? 1 : 0)) * archetypeDataBlock.BurstShotCount;
+                    isNotExact = shootsPerSecondSB % 1 > 0;
+                    value = (int)((shootsPerSecondSB) + (isNotExact ? 1 : 0)) * archetypeDataBlock.BurstShotCount;
 
-                    return (isNotExactSB ? "~" : "") + valueSB;
+                    return (isNotExact ? "~" : "") + value;
             }
-            return "Err";
+
+            if (value > archetypeDataBlock.DefaultClipSize)
+                return archetypeDataBlock.DefaultClipSize.ToString();
+
+            return (isNotExact ? "~" : "") + value;
         }
 
 
