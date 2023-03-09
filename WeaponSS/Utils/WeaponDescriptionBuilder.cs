@@ -127,7 +127,7 @@ namespace WeaponStatShower.Utils
                     if (archetypeDataBlock.BurstShotCount != 1)
                     {
                         sb.Append("Burst (");
-                        sb.Append("<#1212FA>");
+                        sb.Append("<#704dfa>");
                         sb.Append("#" + archetypeDataBlock.BurstShotCount);
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(DIVIDER);
@@ -279,7 +279,7 @@ namespace WeaponStatShower.Utils
             }
 
 
-            builder.Append("<#AAA8FF>");
+            builder.Append("<#6764de>");
             builder.Append($"{Short_Falloff} ");
             builder.Append(((int)archeTypeDataBlock.DamageFalloff.x).ToString() + "m");
             builder.Append(CLOSE_COLOR_TAG);
@@ -303,7 +303,7 @@ namespace WeaponStatShower.Utils
             {
                 builder.Append(DIVIDER);
 
-                builder.Append("<#FFFFFF>");
+                builder.Append("<#cc9347>");
                 builder.Append($"{Short_HipSpread} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.HipFireSpread, 2));
                 builder.Append(CLOSE_COLOR_TAG);
@@ -315,7 +315,7 @@ namespace WeaponStatShower.Utils
             {
                 builder.Append(DIVIDER);
 
-                builder.Append("<#FFFFFF>");
+                builder.Append("<#e6583c>");
                 builder.Append($"{Short_AimSpread} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.AimSpread, 2));
                 builder.Append(CLOSE_COLOR_TAG);
@@ -328,7 +328,7 @@ namespace WeaponStatShower.Utils
             {
                 builder.Append(DIVIDER);
 
-                builder.Append("<#004E2C>");
+                builder.Append("<#097345>");
                 builder.Append($"{Short_PierceCount} ");
                 builder.Append(archeTypeDataBlock.PiercingDamageCountLimit);
                 builder.Append(CLOSE_COLOR_TAG);
@@ -585,7 +585,7 @@ namespace WeaponStatShower.Utils
         private static string Short_Falloff { get; } = "Dist";
         private static string Short_Reload { get; } = "Rld";
         private static string Short_Stagger { get; } = "Stgr";
-        private static string Short_Precision { get; } = "Prcsn";
+        private static string Short_Precision { get; } = "Prcn";
         private static string Short_PierceCount { get; } = "Pierc";
         private static string Short_RateOfFire { get; } = "RoF";
         private static string Short_AimSpread { get; } = "ADS";
