@@ -11,34 +11,36 @@ You can enable which enemy to show from the configuration file located in:
 
 and just follow the instructions.
 
+**You don't need to reload the game to see the changes, just open/close the inventory or click on the weapon type tabs.**
+
 ## **Current stats shown:**
 
-![example](https://i.ibb.co/kcjKq8P/Weapon-Show-Stat-GTFO.png)
+![example](https://i.ibb.co/dmX54YF/Weapon-Show-Stat-GTFO.png)
 
-    - FireMode of the weapon
-    - Charge_Up time (show in brakets)
-    - Recoil class(not dynamic)
-    - Spread Cone for Shotguns
+- FireMode of the weapon (the #n are the number of shots in burst weapons, the **Rate Of Fire** is the number of bullets shot in 1 second)
+- Charge_Up (time in brakets)
+- Spread Cone for Shotguns
+- DMG: the base Damage of the weapon (xN of pellets for shotguns)
+- CLP: the magazine size
+- MAX: the max number of ammo (mag included)
+- RLD: reload time in seconds
+- PRCN: the precision multiplier (if invisible PRCN = 1)
+- DIST: the distance from which the weapon starts dealing less damage
+- HIP: the hip spread value (if invisible HIP = 0 OR shotgun)
+- ADS: the aim down sight spread (if invisible ADS = 0 OR shotgun)
+- STRG: stagger damage multiplier (if invisible, no stagger bonus)
+- PIERC: the number of enemies the bullet can pierce
 
-    - DMG: the base Damage of the weapon
-    - CLP: the magazine size
-    - MAX: the max number of ammo (mag included)
-    - PRCSN: the precision multiplier (if invisible PRCSN = 1)
-    - DIST: the distance from which the weapon starts dealing less damage
-    - RLD: reload time in seconds
-    - STRG: stagger damage multiplier
-    - PIERC: the number of enemies the bullet can pierce
-    - PELTS: the number of pellet fired by a shotgun
+## Enemies selected
 
-    - Enemies selected (DEFAULT: striker, shooter, scout)
-        * Each enemies can have 4 values [C,B,H,O]:
-            - C: chest kill
-            - B: back kill
-            - H: head kill (from front)
-            - O: occiput kill
-
-        * The math is done considering always the max damage possible (so no distance applied and all pellets hit) and all enemies multiplier and armor when applied.
-        * Burst or Auto weapons calculate the damage for just 1 hit.
+- DEFAULT: striker, shooter, scout; see above for configuration.
+  - Each enemies can have 4 values [C,B,H,O]:
+    - C: chest kill
+    - B: back kill
+    - H: head kill (from front)
+    - O: occiput kill
+  - The math is done considering always the max damage possible (so no distance applied and all pellets hit) and all enemies multiplier and armor when applied.
+  - Burst and Auto weapons calculate the damage for just 1 hit.
 
 ## **Installation**
 
