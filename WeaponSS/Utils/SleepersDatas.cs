@@ -146,14 +146,7 @@ namespace WeaponStatShower.Utils
 
         private bool canKillOnChest(float damage, float[] currEnemyDatas)
         {
-            if (isArmored(currEnemyDatas))
-            {
-                return damage * 0.7 >= currEnemyDatas[0];
-            }
-            else
-            {
-                return damage >= currEnemyDatas[0];
-            }
+            return damage >= currEnemyDatas[0];
         }
 
 
@@ -174,7 +167,7 @@ namespace WeaponStatShower.Utils
         {
             if (isArmored(currEnemyDatas))
             {
-                return damage * 0.7 * currEnemyDatas[1] >= currEnemyDatas[0];
+                return damage * currEnemyDatas[1] >= currEnemyDatas[0];
             }
             else
             {
@@ -186,7 +179,7 @@ namespace WeaponStatShower.Utils
         {
             if (isArmored(currEnemyDatas))
             {
-                return damage * 0.7 * currEnemyDatas[2] * currEnemyDatas[1] >= currEnemyDatas[0];
+                return damage * currEnemyDatas[2] * currEnemyDatas[1] >= currEnemyDatas[0];
             }
             else
             {

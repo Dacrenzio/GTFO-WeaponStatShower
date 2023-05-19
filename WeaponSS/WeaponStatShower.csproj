@@ -9,8 +9,8 @@
     <DebugType>None</DebugType>
     <AssemblyName>$(SolutionName)</AssemblyName>
     <RootNamespace>$(SolutionName)</RootNamespace>
-    <BepInEx>D:\GTFO\GTFO Build 03022023\BepInEx</BepInEx>
-    <BuildDirectory>$(BepInEx)\plugins\Dacrenzio-$(SolutionName)-1.2.0\</BuildDirectory>
+    <BepInEx>D:\GTFO\GTFO Build 05062023\BepInEx</BepInEx>
+    <BuildDirectory>$(BepInEx)\plugins\Dacrenzio-$(SolutionName)-1.3.0\</BuildDirectory>
     <OutputPath>$(BuildDirectory)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
