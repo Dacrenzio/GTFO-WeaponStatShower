@@ -153,14 +153,7 @@ namespace WeaponStatShower.Utils
 
         private bool canKillOnBack(float damage, float prcsnMultiplier, float[] currEnemyDatas)
         {
-            if (isArmored(currEnemyDatas))
-            {
-                return damage * prcsnMultiplier * currEnemyDatas[2] >= currEnemyDatas[0];
-            }
-            else
-            {
-                return damage * currEnemyDatas[2] >= currEnemyDatas[0];
-            }
+            return damage * currEnemyDatas[2] >= currEnemyDatas[0];
         }
 
         private bool canKillOnHead(float damage, float prcsnMultiplier, float[] currEnemyDatas)
