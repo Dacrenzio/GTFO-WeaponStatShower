@@ -97,8 +97,9 @@ namespace WeaponStatShower.Utils
 
         private string VerbosePublicNameFireMode(ArchetypeDataBlock archetypeDataBlock)
         {
+            eWeaponFireMode fireMode = archetypeDataBlock.FireMode;
             StringBuilder sb = new StringBuilder();
-            switch (archetypeDataBlock.FireMode)
+            switch (fireMode)
             {
                 case eWeaponFireMode.Auto:
                 case eWeaponFireMode.SentryGunAuto:
@@ -106,7 +107,7 @@ namespace WeaponStatShower.Utils
                     sb.Append("Full-A (");
                     sb.Append("<#12FF50>");
                     sb.Append(Short_RateOfFire + " ");
-                    sb.Append(GetRateOfFire(archetypeDataBlock));
+                    sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.Append(")"); 
                     break;
@@ -117,7 +118,7 @@ namespace WeaponStatShower.Utils
                     sb.Append("Semi-A (");
                     sb.Append("<#12FF50>");
                     sb.Append(Short_RateOfFire + " ");
-                    sb.Append(GetRateOfFire(archetypeDataBlock));
+                    sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.Append(")");
                     break;
@@ -133,7 +134,7 @@ namespace WeaponStatShower.Utils
                         sb.Append(DIVIDER);
                         sb.Append("<#12FF50>");
                         sb.Append(Short_RateOfFire + " ");
-                        sb.Append(GetRateOfFire(archetypeDataBlock));
+                        sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(")");
                     }
@@ -142,7 +143,7 @@ namespace WeaponStatShower.Utils
                         sb.Append("Semi-A (");
                         sb.Append("<#12FF50>");
                         sb.Append(Short_RateOfFire + " ");
-                        sb.Append(GetRateOfFire(archetypeDataBlock));
+                        sb.Append(GetRateOfFire(archetypeDataBlock, eWeaponFireMode.Semi));
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(")");
                         break;
@@ -161,7 +162,7 @@ namespace WeaponStatShower.Utils
                     sb.Append("Shotgun-S (");
                     sb.Append("<#12FF50>");
                     sb.Append(Short_RateOfFire + " ");
-                    sb.Append(GetRateOfFire(archetypeDataBlock));
+                    sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.Append(")");
                     break;
@@ -541,29 +542,24 @@ namespace WeaponStatShower.Utils
             return maxBullets + archetypeDataBlock.DefaultClipSize;
         }
 
-        private string GetRateOfFire(ArchetypeDataBlock archetypeDataBlock)
+        private string GetRateOfFire(ArchetypeDataBlock archetypeDataBlock, eWeaponFireMode fireMode)
         {
             float value = -1F;
 
-            switch (archetypeDataBlock.FireMode)
+            switch (fireMode)
             {
-                case eWeaponFireMode.SentryGunShotgunSemi:
                 case eWeaponFireMode.Auto:
+                case eWeaponFireMode.SentryGunAuto:
+                    value = 1 / archetypeDataBlock.ShotDelay;
+                    break;
+                case eWeaponFireMode.SentryGunShotgunSemi:
                 case eWeaponFireMode.Semi:
                     value = 1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime);
                     break;
-
                 case eWeaponFireMode.SentryGunBurst:
                 case eWeaponFireMode.Burst:
-                    if(archetypeDataBlock.BurstShotCount != 1)
-                    {
-                        float shootsPerSecondSB = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * (archetypeDataBlock.BurstShotCount -1)));
-                        value = (shootsPerSecondSB) * archetypeDataBlock.BurstShotCount;
-                    }
-                    else
-                    {
-                        value = 1 / (archetypeDataBlock.ShotDelay + archetypeDataBlock.SpecialChargetupTime);
-                    }
+                    float shootsPerSecondSB = 1 / (archetypeDataBlock.BurstDelay + archetypeDataBlock.SpecialChargetupTime + (archetypeDataBlock.ShotDelay * (archetypeDataBlock.BurstShotCount -1)));
+                    value = (shootsPerSecondSB) * archetypeDataBlock.BurstShotCount;
                     break;
             }
 
