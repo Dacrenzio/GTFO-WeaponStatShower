@@ -1,0 +1,121 @@
+[
+  {
+    "firemode": {
+      "firemode_FullA": "Full-A",
+      "firemode_SemiA": "Semi-A",
+      "firemode_Burst": "Burst",
+      "firemode_Shotgun_Sentry": "Shotgun-S"
+    },
+
+    "melee": {
+      "light": ".Lgt",
+      "heavy": ".Hvy",
+      "canRunWhileCharging": "Run",
+      "sleepingEnemiesMultiplier": "Slp",
+      "environmentMultiplier": "Env",
+      "canPierce": "Piercing",
+      "short_range": "Short Range",
+      "medium_range": "Medium Range",
+      "long_range": "Long Range",
+      "hammer": "Hammer - Balanced",
+      "knife": "Knife - Fast",
+      "bat": "Bat - Fast",
+      "spear": "Spear - Slow"
+    },
+
+    "spread": {
+      "chocked": "Chocked Spread",
+      "small": "Small Spread",
+      "medium": "Medium Spread",
+      "large": "Large Spread",
+      "huge": "Huge Spread"
+    },
+
+    "sleepers": {
+      "striker": "STRK",
+      "shooter": "SHTR",
+      "scout": "SCOUT",
+      "big_striker": "B-STRK",
+      "big_shooter": "B-SHTR",
+      "charger": "CHRG",
+      "charger_scout": "C-SCOUT",
+      "occipit": "o",
+      "head": "h",
+      "back": "b",
+      "chest": "c"
+    },
+
+    "damage": "Dmg",
+    "clip": "Clp",
+    "maxAmmo": "Max",
+    "falloff": "Dist",
+    "reload": "Rld",
+    "stagger": "Stgr",
+    "precision": "Prcn",
+    "pierceCount": "Pierc",
+    "rateOfFire": "RoF",
+    "aimDSpread": "ADS",
+    "hipSpread": "HIP",
+    "deployable": "Deployable"
+  },
+
+  {
+    "firemode": {
+      "firemode_FullA": "全自动",
+      "firemode_SemiA": "半自动",
+      "firemode_Burst": "连发",
+      "firemode_Shotgun_Sentry": "半自动霰弹射击"
+    },
+
+    "melee": {
+      "light": "轻击",
+      "heavy": "重击",
+      "canRunWhileCharging": "冲刺",
+      "sleepingEnemiesMultiplier": "沉睡倍率",
+      "environmentMultiplier": "环境倍率",
+      "canPierce": "穿刺",
+      "short_range": "短距离",
+      "medium_range": "中距离",
+      "long_range": "长距离",
+      "hammer": "大锤 - 均衡",
+      "knife": "刀 - 快速",
+      "bat": "棍棒 - 快速",
+      "spear": "矛 - 慢速"
+    },
+
+    "spread": {
+      "chocked": "收束扩散",
+      "small": "扩散小",
+      "medium": "扩散中",
+      "large": "扩散大",
+      "huge": "超大扩散"
+    },
+
+    "sleepers": {
+      "striker": "前锋",
+      "shooter": "射手",
+      "scout": "哨兵",
+      "big_striker": "大壮",
+      "big_shooter": "大姐",
+      "charger": "黑刺",
+      "charger_scout": "黑触",
+      "occipit": "后脑]",
+      "head": "头",
+      "back": "背",
+      "chest": "胸"
+    },
+
+    "damage": "伤害",
+    "clip": "弹容量",
+    "maxAmmo": "总弹量",
+    "falloff": "衰减距离",
+    "reload": "换弹时间",
+    "stagger": "硬直倍率",
+    "precision": "精准倍率",
+    "pierceCount": "穿透",
+    "rateOfFire": "射速",
+    "aimDSpread": "倍镜",
+    "hipSpread": "后坐力",
+    "deployable": "可部署"
+  }
+]

@@ -17,13 +17,13 @@ namespace WeaponStatShower.Utils
                         EnemyDatas.Clear(); //just to be sure
                         return;
                     case "ALL":
-                        EnemyDatas.TryAdd("STRK", new float[] { 20, 3, 2, 0 });
-                        EnemyDatas.TryAdd("SHTR", new float[] { 30, 5, 2, 0 });
-                        EnemyDatas.TryAdd("SCOUT", new float[] { 42, 3, 2, 0 });
-                        EnemyDatas.TryAdd("B-STRK", new float[] { 120, 1.5F, 2, 0 });
-                        EnemyDatas.TryAdd("B-SHTR", new float[] { 150, 2, 2, 0 });
-                        EnemyDatas.TryAdd("CHRG", new float[] { 30, 1, 2, 1 });
-                        EnemyDatas.TryAdd("C-SCOUT", new float[] { 60, 1, 2, 1 });
+                        EnemyDatas.TryAdd(striker, new float[] { 20, 3, 2, 0 });
+                        EnemyDatas.TryAdd(shooter, new float[] { 30, 5, 2, 0 });
+                        EnemyDatas.TryAdd(scout, new float[] { 42, 3, 2, 0 });
+                        EnemyDatas.TryAdd(big_striker, new float[] { 120, 1.5F, 2, 0 });
+                        EnemyDatas.TryAdd(big_shooter, new float[] { 150, 2, 2, 0 });
+                        EnemyDatas.TryAdd(charger, new float[] { 30, 1, 2, 1 });
+                        EnemyDatas.TryAdd(charger_scout, new float[] { 60, 1, 2, 1 });
                         return;
                     case "STRIKER":
                         EnemyDatas.TryAdd("STRK", new float[] { 20, 3, 2, 0 });
@@ -67,16 +67,16 @@ namespace WeaponStatShower.Utils
                 float[] currEnemyDatas = EnemyDatas[enemyName];
 
                 if (canKillOnOccipit(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add('o');
+                    killPlace.Add(occipit);
 
                 if (canKillOnHead(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add('h');
+                    killPlace.Add(head);
 
                 if (canKillOnBack(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add('b');
+                    killPlace.Add(back);
 
                 if (canKillOnChest(damage, currEnemyDatas))
-                    killPlace.Add('c');
+                    killPlace.Add(chest);
 
 
                 if (killPlace.Count > 0)
@@ -114,16 +114,16 @@ namespace WeaponStatShower.Utils
                 float[] currEnemyDatas = EnemyDatas[enemyName];
 
                 if (canKillOnOccipit(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add('o');
+                    killPlace.Add(occipit);
 
                 if (canKillOnHead(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add('h');
+                    killPlace.Add(head);
 
                 if (canKillOnBack(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add('b');
+                    killPlace.Add(back);
 
                 if (canKillOnChest(damage, currEnemyDatas))
-                    killPlace.Add('c');
+                    killPlace.Add(chest);
 
 
                 if (killPlace.Count > 0)

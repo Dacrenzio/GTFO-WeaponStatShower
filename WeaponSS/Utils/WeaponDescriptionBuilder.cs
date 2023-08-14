@@ -2,6 +2,7 @@
 using Gear;
 using Player;
 using System.Text;
+using WeaponStatShower.Utils.Language;
 
 namespace WeaponStatShower.Utils
 {
@@ -16,17 +17,17 @@ namespace WeaponStatShower.Utils
         private ItemDataBlock itemDataBlock;
 
 
-        public void UpdateSleepersDatas(string[] activatedSleepers)
+        public void UpdateSleepersDatas(string[] activatedSleepers, LanguageEnum language)
         {
-            if (activatedSleepers[0].Length == 0)
+            if (activatedSleepers[0].Trim().Length == 0)
             {
                 WeaponStatShowerPlugin.LogWarning("Empty String in the config file, applying Default values");
-                activatedSleepers = new string[] { "STRIKER", "SHOOTER", "SCOUT" };
+                activatedSleepers = new string[] { "ALL" };
             }
             sleepersDatas = new SleepersDatas(activatedSleepers);
         }
 
-        public string DescriptionFormatter(string GearDescription)
+        public string DescriptionFormatter(string GearDescription, LanguageEnum language)
         {
 
             if (itemDataBlock.inventorySlot == InventorySlot.GearMelee)
@@ -55,7 +56,7 @@ namespace WeaponStatShower.Utils
             }
         }
 
-        internal string FireRateFormatter(string gearPublicName)
+        internal string FireRateFormatter(string gearPublicName, LanguageEnum language)
         {
             if (itemDataBlock.inventorySlot == InventorySlot.GearMelee)
             {
@@ -83,13 +84,13 @@ namespace WeaponStatShower.Utils
             switch (meleeArchetypeDataBlock.persistentID)
             {
                 case 1:
-                    return "Hammer - Balanced";
+                    return hammer;
                 case 2:
-                    return "Knife - Fast";
+                    return knife;
                 case 4:
-                    return "Bat - Fast";
+                    return bat;
                 case 3:
-                    return "Spear - Slow";
+                    return spear;
                 default:
                     return "";
             }
@@ -104,7 +105,7 @@ namespace WeaponStatShower.Utils
                 case eWeaponFireMode.Auto:
                 case eWeaponFireMode.SentryGunAuto:
 
-                    sb.Append("Full-A (");
+                    sb.Append(firemode_FullA + " (");
                     sb.Append("<#12FF50>");
                     sb.Append(Short_RateOfFire + " ");
                     sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
@@ -115,9 +116,9 @@ namespace WeaponStatShower.Utils
                 case eWeaponFireMode.Semi:
                 case eWeaponFireMode.SentryGunSemi:
 
-                    sb.Append("Semi-A (");
+                    sb.Append(firemode_SemiA+" (");
                     sb.Append("<#12FF50>");
-                    sb.Append(Short_RateOfFire + " ");
+                    sb.Append(Short_RateOfFire+" ");
                     sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.Append(")");
@@ -127,22 +128,22 @@ namespace WeaponStatShower.Utils
                 case eWeaponFireMode.SentryGunBurst:
                     if (archetypeDataBlock.BurstShotCount != 1)
                     {
-                        sb.Append("Burst (");
+                        sb.Append(firemode_Burst+" (");
                         sb.Append("<#704dfa>");
                         sb.Append("#" + archetypeDataBlock.BurstShotCount);
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(DIVIDER);
                         sb.Append("<#12FF50>");
-                        sb.Append(Short_RateOfFire + " ");
+                        sb.Append(Short_RateOfFire+" ");
                         sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(")");
                     }
                     else
                     {
-                        sb.Append("Semi-A (");
+                        sb.Append(firemode_SemiA+" (");
                         sb.Append("<#12FF50>");
-                        sb.Append(Short_RateOfFire + " ");
+                        sb.Append(Short_RateOfFire+" ");
                         sb.Append(GetRateOfFire(archetypeDataBlock, eWeaponFireMode.Semi));
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(")");
@@ -159,7 +160,7 @@ namespace WeaponStatShower.Utils
                     break;
 
                 case eWeaponFireMode.SentryGunShotgunSemi:
-                    sb.Append("Shotgun-S (");
+                    sb.Append(firemode_Shotgun_Sentry+" (");
                     sb.Append("<#12FF50>");
                     sb.Append(Short_RateOfFire + " ");
                     sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
@@ -178,9 +179,9 @@ namespace WeaponStatShower.Utils
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(meleeArchetypeDataBlock.CameraDamageRayLength < 1.76 ? "Short Range" : meleeArchetypeDataBlock.CameraDamageRayLength < 2.5 ? "Medium Range" : "Long Range");
+            sb.AppendLine(meleeArchetypeDataBlock.CameraDamageRayLength < 1.76 ? melee_shr_range : meleeArchetypeDataBlock.CameraDamageRayLength < 2.5 ? melee_mdm_range : melee_lng_range);
 
-            sb.Append(meleeArchetypeDataBlock.CanHitMultipleEnemies? "Piercing\n": "");
+            sb.Append(meleeArchetypeDataBlock.CanHitMultipleEnemies? meleeArchetypeDataBlock_piercing+"\n": "");
 
             return "".Equals(sb.ToString()) ? "" : sb.ToString() + "\n";
         }
@@ -190,25 +191,25 @@ namespace WeaponStatShower.Utils
             StringBuilder sb = new StringBuilder();
 
             if (isSentryGun)
-                sb.AppendLine("Deployable");
+                sb.AppendLine(deployable);
 
             switch (archetypeDataBlock.ShotgunBulletSpread + archetypeDataBlock.ShotgunConeSize)
             {
                 case 0: break;
                 case 1:
-                    sb.AppendLine("Chocked Spread");
+                    sb.AppendLine(Chk_Spr);
                     break;
                 case 4:
-                    sb.AppendLine("Small Spread");
+                    sb.AppendLine(Sml_Spr);
                     break;
                 case 5:
-                    sb.AppendLine("Medium Spread");
+                    sb.AppendLine(Mdm_Spr);
                     break;
                 case 7:
-                    sb.AppendLine("Large Spread");
+                    sb.AppendLine(Lrg_Spr);
                     break;
                 case 9:
-                    sb.AppendLine("Huge Spread");
+                    sb.AppendLine(Hge_Spr);
                     break;
                 default:
                     WeaponStatShowerPlugin.LogError(archetypeDataBlock.PublicName + ": spread not considered{" + archetypeDataBlock.ShotgunBulletSpread + "/" + archetypeDataBlock.ShotgunConeSize +"}");
@@ -581,24 +582,5 @@ namespace WeaponStatShower.Utils
 
         private const string DIVIDER = " | ";
         private const string CLOSE_COLOR_TAG = "</color>";
-
-        private static string Short_MeleeLight { get; } = ".Lgt";
-        private static string Short_MeleeCharged { get; } = ".Hvy";
-
-        private static string Short_MeleeCanRunWhileCharging { get; } = "Run";
-        private static string Short_MeleeSleepingEnemiesMultiplier { get; } = "Slp";
-        private static string Short_EnvironmentMultiplier { get; } = "Env";
-
-        private static string Short_Damage { get; } = "Dmg";
-        private static string Short_Clip { get; } = "Clp";
-        private static string Short_MaxAmmo { get; } = "Max";
-        private static string Short_Falloff { get; } = "Dist";
-        private static string Short_Reload { get; } = "Rld";
-        private static string Short_Stagger { get; } = "Stgr";
-        private static string Short_Precision { get; } = "Prcn";
-        private static string Short_PierceCount { get; } = "Pierc";
-        private static string Short_RateOfFire { get; } = "RoF";
-        private static string Short_AimSpread { get; } = "ADS";
-        private static string Short_HipSpread { get; } = "HIP";
     }
 }
