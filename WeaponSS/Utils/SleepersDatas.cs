@@ -1,14 +1,17 @@
 ﻿using GameData;
 using System.Text;
+using WeaponStatShower.Utils.Language.Models;
 
 namespace WeaponStatShower.Utils
 {
     internal class SleepersDatas
     {
         private readonly Dictionary<string, float[]> EnemyDatas = new Dictionary<string, float[]>();
+        private SleepersLanguageModel sleepersLanguageDatas;
 
-        public SleepersDatas(string[] activatedSleepers)
+        public SleepersDatas(string[] activatedSleepers, SleepersLanguageModel sleepersLanguageDatas)
         {
+            this.sleepersLanguageDatas = sleepersLanguageDatas;
             foreach (string monster in activatedSleepers)
             {
                 switch (monster.Trim())
@@ -17,34 +20,34 @@ namespace WeaponStatShower.Utils
                         EnemyDatas.Clear(); //just to be sure
                         return;
                     case "ALL":
-                        EnemyDatas.TryAdd(striker, new float[] { 20, 3, 2, 0 });
-                        EnemyDatas.TryAdd(shooter, new float[] { 30, 5, 2, 0 });
-                        EnemyDatas.TryAdd(scout, new float[] { 42, 3, 2, 0 });
-                        EnemyDatas.TryAdd(big_striker, new float[] { 120, 1.5F, 2, 0 });
-                        EnemyDatas.TryAdd(big_shooter, new float[] { 150, 2, 2, 0 });
-                        EnemyDatas.TryAdd(charger, new float[] { 30, 1, 2, 1 });
-                        EnemyDatas.TryAdd(charger_scout, new float[] { 60, 1, 2, 1 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.striker, new float[] { 20, 3, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.shooter, new float[] { 30, 5, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.scout, new float[] { 42, 3, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.bigStriker, new float[] { 120, 1.5F, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.bigShooter, new float[] { 150, 2, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.charger, new float[] { 30, 1, 2, 1 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.chargerScout, new float[] { 60, 1, 2, 1 });
                         return;
                     case "STRIKER":
-                        EnemyDatas.TryAdd("STRK", new float[] { 20, 3, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.striker, new float[] { 20, 3, 2, 0 });
                         break;
                     case "SHOOTER":
-                        EnemyDatas.TryAdd("SHTR", new float[] { 30, 5, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.shooter, new float[] { 30, 5, 2, 0 });
                         break;
                     case "SCOUT":
-                        EnemyDatas.TryAdd("SCOUT", new float[] { 42, 3, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.scout, new float[] { 42, 3, 2, 0 });
                         break;
                     case "BIG_STRIKER":
-                        EnemyDatas.TryAdd("B-STRK", new float[] { 120, 1.5F, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.bigStriker, new float[] { 120, 1.5F, 2, 0 });
                         break;
                     case "BIG_SHOOTER":
-                        EnemyDatas.TryAdd("B-SHTR", new float[] { 150, 2, 2, 0 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.bigShooter, new float[] { 150, 2, 2, 0 });
                         break;
                     case "CHARGER":
-                        EnemyDatas.TryAdd("CHRG", new float[] { 30, 1, 2, 1 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.charger, new float[] { 30, 1, 2, 1 });
                         break;
                     case "CHARGER_SCOUT":
-                        EnemyDatas.TryAdd("C-SCOUT", new float[] { 60, 1, 2, 1 });
+                        EnemyDatas.TryAdd(sleepersLanguageDatas.chargerScout, new float[] { 60, 1, 2, 1 });
                         break;
                     default:
                         WeaponStatShowerPlugin.LogWarning("You inserted an incorrect value in the config: " + monster.Trim());
@@ -63,20 +66,20 @@ namespace WeaponStatShower.Utils
             for (int i = 0; i < EnemyDatas.Count; i++)
             {
                 string enemyName = EnemyDatas.Keys.ElementAt(i);
-                List<char> killPlace = new List<char>();
+                List<string> killPlace = new List<string>();
                 float[] currEnemyDatas = EnemyDatas[enemyName];
 
                 if (canKillOnOccipit(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add(occipit);
+                    killPlace.Add(sleepersLanguageDatas.occipit);
 
                 if (canKillOnHead(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add(head);
+                    killPlace.Add(sleepersLanguageDatas.head);
 
-                if (canKillOnBack(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add(back);
+                if (canKillOnBack(damage, currEnemyDatas))
+                    killPlace.Add(sleepersLanguageDatas.back);
 
                 if (canKillOnChest(damage, currEnemyDatas))
-                    killPlace.Add(chest);
+                    killPlace.Add(sleepersLanguageDatas.chest);
 
 
                 if (killPlace.Count > 0)
@@ -107,23 +110,23 @@ namespace WeaponStatShower.Utils
             for (int i = 0; i < EnemyDatas.Count; i++)
             {
                 string enemyName = EnemyDatas.Keys.ElementAt(i);
-                if (enemyName.Contains("SCOUT"))
+                if (enemyName.Contains("SCOUT") || enemyName.Contains("哨兵") || enemyName.Contains("黑触"))
                     damage /= archeTypeDataBlock.ChargedSleeperMulti;
 
-                List<char> killPlace = new List<char>();
+                List<string> killPlace = new List<string>();
                 float[] currEnemyDatas = EnemyDatas[enemyName];
 
                 if (canKillOnOccipit(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add(occipit);
+                    killPlace.Add(sleepersLanguageDatas.occipit);
 
                 if (canKillOnHead(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add(head);
+                    killPlace.Add(sleepersLanguageDatas.head);
 
-                if (canKillOnBack(damage, prcsnMultiplier, currEnemyDatas))
-                    killPlace.Add(back);
+                if (canKillOnBack(damage, currEnemyDatas))
+                    killPlace.Add(sleepersLanguageDatas.back);
 
                 if (canKillOnChest(damage, currEnemyDatas))
-                    killPlace.Add(chest);
+                    killPlace.Add(sleepersLanguageDatas.chest);
 
 
                 if (killPlace.Count > 0)
@@ -151,7 +154,7 @@ namespace WeaponStatShower.Utils
 
 
 
-        private bool canKillOnBack(float damage, float prcsnMultiplier, float[] currEnemyDatas)
+        private bool canKillOnBack(float damage, float[] currEnemyDatas)
         {
             return damage * currEnemyDatas[2] >= currEnemyDatas[0];
         }

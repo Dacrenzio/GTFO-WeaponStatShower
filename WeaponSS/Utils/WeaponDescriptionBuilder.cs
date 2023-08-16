@@ -1,21 +1,34 @@
 ﻿using GameData;
 using Gear;
+using Il2CppSystem.Resources;
 using Player;
 using System.Text;
+using System.Text.Json;
 using WeaponStatShower.Utils.Language;
+using WeaponStatShower.Utils.Language.Models;
 
 namespace WeaponStatShower.Utils
 {
     internal class WeaponDescriptionBuilder
     {
         private SleepersDatas sleepersDatas;
-        private PlayerDataBlock _playerDataBlock { get; set; }
-        private GearIDRange idRange { get; set; }
-
+        private PlayerDataBlock _playerDataBlock;
+        private GearIDRange idRange;
         private uint categoryID;
         private GearCategoryDataBlock gearCatBlock;
         private ItemDataBlock itemDataBlock;
+        private LanguageDatasClass languageDatas;
 
+        internal void Inizialize(GearIDRange idRange, PlayerDataBlock playerDataBlock, LanguageEnum language)
+        {
+            this.idRange = idRange;
+            _playerDataBlock = playerDataBlock;
+            categoryID = idRange.GetCompID(eGearComponent.Category);
+            gearCatBlock = GameDataBlockBase<GearCategoryDataBlock>.GetBlock(categoryID);
+            itemDataBlock = ItemDataBlock.GetBlock(gearCatBlock.BaseItem);
+
+            languageDatas = desirializeLanguageJson(language);
+        }
 
         public void UpdateSleepersDatas(string[] activatedSleepers, LanguageEnum language)
         {
@@ -24,10 +37,24 @@ namespace WeaponStatShower.Utils
                 WeaponStatShowerPlugin.LogWarning("Empty String in the config file, applying Default values");
                 activatedSleepers = new string[] { "ALL" };
             }
-            sleepersDatas = new SleepersDatas(activatedSleepers);
+            sleepersDatas = new SleepersDatas(activatedSleepers, desirializeLanguageJson(language).sleepers);
         }
 
-        public string DescriptionFormatter(string GearDescription, LanguageEnum language)
+        private LanguageDatasClass desirializeLanguageJson(LanguageEnum language)
+        {
+            string fileName = "./Language/LocalizatedStrings.json";
+            string jsonString = File.ReadAllText(fileName);
+            List<LanguageDatasClass> allObject = JsonSerializer.Deserialize<List<LanguageDatasClass>>(jsonString)!;
+            return language.Equals(LanguageEnum.English) ? allObject[0] : allObject[1]; ;
+        }
+
+
+
+
+
+
+
+        public string DescriptionFormatter(string GearDescription)
         {
 
             if (itemDataBlock.inventorySlot == InventorySlot.GearMelee)
@@ -56,7 +83,7 @@ namespace WeaponStatShower.Utils
             }
         }
 
-        internal string FireRateFormatter(string gearPublicName, LanguageEnum language)
+        internal string FireRateFormatter(string gearPublicName)
         {
             if (itemDataBlock.inventorySlot == InventorySlot.GearMelee)
             {
@@ -81,16 +108,17 @@ namespace WeaponStatShower.Utils
 
         private string VerbosePublicNameMelee(MeleeArchetypeDataBlock meleeArchetypeDataBlock)
         {
+            MeleeLanguageModel meleeLanguage = languageDatas.melee;
             switch (meleeArchetypeDataBlock.persistentID)
             {
                 case 1:
-                    return hammer;
+                    return meleeLanguage.hammer;
                 case 2:
-                    return knife;
+                    return meleeLanguage.knife;
                 case 4:
-                    return bat;
+                    return meleeLanguage.bat;
                 case 3:
-                    return spear;
+                    return meleeLanguage.spear;
                 default:
                     return "";
             }
@@ -98,6 +126,7 @@ namespace WeaponStatShower.Utils
 
         private string VerbosePublicNameFireMode(ArchetypeDataBlock archetypeDataBlock)
         {
+            FiremodeLanguageModel firemodeLanguage = languageDatas.firemode;
             eWeaponFireMode fireMode = archetypeDataBlock.FireMode;
             StringBuilder sb = new StringBuilder();
             switch (fireMode)
@@ -105,9 +134,9 @@ namespace WeaponStatShower.Utils
                 case eWeaponFireMode.Auto:
                 case eWeaponFireMode.SentryGunAuto:
 
-                    sb.Append(firemode_FullA + " (");
+                    sb.Append(firemodeLanguage.fullA + " (");
                     sb.Append("<#12FF50>");
-                    sb.Append(Short_RateOfFire + " ");
+                    sb.Append(languageDatas.rateOfFire + " ");
                     sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.Append(")"); 
@@ -116,9 +145,9 @@ namespace WeaponStatShower.Utils
                 case eWeaponFireMode.Semi:
                 case eWeaponFireMode.SentryGunSemi:
 
-                    sb.Append(firemode_SemiA+" (");
+                    sb.Append(firemodeLanguage.semiA +" (");
                     sb.Append("<#12FF50>");
-                    sb.Append(Short_RateOfFire+" ");
+                    sb.Append(languageDatas.rateOfFire+" ");
                     sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.Append(")");
@@ -128,22 +157,22 @@ namespace WeaponStatShower.Utils
                 case eWeaponFireMode.SentryGunBurst:
                     if (archetypeDataBlock.BurstShotCount != 1)
                     {
-                        sb.Append(firemode_Burst+" (");
+                        sb.Append(firemodeLanguage.burst +" (");
                         sb.Append("<#704dfa>");
                         sb.Append("#" + archetypeDataBlock.BurstShotCount);
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(DIVIDER);
                         sb.Append("<#12FF50>");
-                        sb.Append(Short_RateOfFire+" ");
+                        sb.Append(languageDatas.rateOfFire +" ");
                         sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(")");
                     }
                     else
                     {
-                        sb.Append(firemode_SemiA+" (");
+                        sb.Append(firemodeLanguage.semiA + " (");
                         sb.Append("<#12FF50>");
-                        sb.Append(Short_RateOfFire+" ");
+                        sb.Append(languageDatas.rateOfFire +" ");
                         sb.Append(GetRateOfFire(archetypeDataBlock, eWeaponFireMode.Semi));
                         sb.Append(CLOSE_COLOR_TAG);
                         sb.Append(")");
@@ -160,9 +189,9 @@ namespace WeaponStatShower.Utils
                     break;
 
                 case eWeaponFireMode.SentryGunShotgunSemi:
-                    sb.Append(firemode_Shotgun_Sentry+" (");
+                    sb.Append(firemodeLanguage.shotgunSentry + " (");
                     sb.Append("<#12FF50>");
-                    sb.Append(Short_RateOfFire + " ");
+                    sb.Append(languageDatas.rateOfFire + " ");
                     sb.Append(GetRateOfFire(archetypeDataBlock, fireMode));
                     sb.Append(CLOSE_COLOR_TAG);
                     sb.Append(")");
@@ -179,9 +208,9 @@ namespace WeaponStatShower.Utils
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(meleeArchetypeDataBlock.CameraDamageRayLength < 1.76 ? melee_shr_range : meleeArchetypeDataBlock.CameraDamageRayLength < 2.5 ? melee_mdm_range : melee_lng_range);
+            sb.AppendLine(meleeArchetypeDataBlock.CameraDamageRayLength < 1.76 ? languageDatas.melee.shortRange : meleeArchetypeDataBlock.CameraDamageRayLength < 2.5 ? languageDatas.melee.mediumRange : languageDatas.melee.longRange);
 
-            sb.Append(meleeArchetypeDataBlock.CanHitMultipleEnemies? meleeArchetypeDataBlock_piercing+"\n": "");
+            sb.Append(meleeArchetypeDataBlock.CanHitMultipleEnemies? languageDatas.melee.canPierce+ "\n": "");
 
             return "".Equals(sb.ToString()) ? "" : sb.ToString() + "\n";
         }
@@ -189,27 +218,27 @@ namespace WeaponStatShower.Utils
         private string VerboseDescriptionFormatter(ArchetypeDataBlock archetypeDataBlock, bool isSentryGun)
         {
             StringBuilder sb = new StringBuilder();
-
+            SpreadLanguageModel spread = languageDatas.spread;
             if (isSentryGun)
-                sb.AppendLine(deployable);
+                sb.AppendLine(languageDatas.deployable);
 
             switch (archetypeDataBlock.ShotgunBulletSpread + archetypeDataBlock.ShotgunConeSize)
             {
                 case 0: break;
                 case 1:
-                    sb.AppendLine(Chk_Spr);
+                    sb.AppendLine(spread.chocked);
                     break;
                 case 4:
-                    sb.AppendLine(Sml_Spr);
+                    sb.AppendLine(spread.small);
                     break;
                 case 5:
-                    sb.AppendLine(Mdm_Spr);
+                    sb.AppendLine(spread.medium);
                     break;
                 case 7:
-                    sb.AppendLine(Lrg_Spr);
+                    sb.AppendLine(spread.medium);
                     break;
                 case 9:
-                    sb.AppendLine(Hge_Spr);
+                    sb.AppendLine(spread.huge);
                     break;
                 default:
                     WeaponStatShowerPlugin.LogError(archetypeDataBlock.PublicName + ": spread not considered{" + archetypeDataBlock.ShotgunBulletSpread + "/" + archetypeDataBlock.ShotgunConeSize +"}");
@@ -218,8 +247,9 @@ namespace WeaponStatShower.Utils
 
             if (archetypeDataBlock.SpecialChargetupTime > 0)
                 sb.AppendLine(archetypeDataBlock.SpecialChargetupTime > 0.4 ?
-                    "Long Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime, 2) + ")" :
-                    "Short Charge-up (" + FormatFloat(archetypeDataBlock.SpecialChargetupTime, 2) + ")");
+                    $"{languageDatas.longChargeUp} ({FormatFloat(archetypeDataBlock.SpecialChargetupTime, 2)})" :
+                    $"{languageDatas.shortChargeUp} ({FormatFloat(archetypeDataBlock.SpecialChargetupTime, 2)})"
+                );
 
             return "".Equals(sb.ToString())? "" : sb.ToString() + "\n";
         }
@@ -247,7 +277,7 @@ namespace WeaponStatShower.Utils
             int count = 0;
 
             builder.Append("<#9D2929>");
-            builder.Append($"{Short_Damage} ");
+            builder.Append($"{languageDatas.damage} ");
             builder.Append(FormatFloat(archeTypeDataBlock.Damage, 2));
             builder.Append(archeTypeDataBlock.ShotgunBulletCount > 0? "(x"+ archeTypeDataBlock.ShotgunBulletCount +")" : "");
             builder.Append(CLOSE_COLOR_TAG);
@@ -258,7 +288,7 @@ namespace WeaponStatShower.Utils
                 builder.Append(DIVIDER);
 
                 builder.Append("<color=orange>");
-                builder.Append($"{Short_Clip} ");
+                builder.Append($"{languageDatas.clip} ");
                 builder.Append(archeTypeDataBlock.DefaultClipSize);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -267,7 +297,7 @@ namespace WeaponStatShower.Utils
             builder.Append(DIVIDER);
 
             builder.Append("<#FFD306>");
-            builder.Append($"{Short_MaxAmmo} ");
+            builder.Append($"{languageDatas.maxAmmo} ");
             builder.Append(GetTotalAmmo(archeTypeDataBlock, itemDataBlock, isSentryGun));
             builder.Append(CLOSE_COLOR_TAG);
             count++;
@@ -277,7 +307,7 @@ namespace WeaponStatShower.Utils
                 builder.Append(DIVIDER);
 
                 builder.Append("<#C0FF00>");
-                builder.Append($"{Short_Reload} ");
+                builder.Append($"{languageDatas.reload} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.DefaultReloadTime, 2));
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -288,7 +318,7 @@ namespace WeaponStatShower.Utils
             {
                 Divider(ref count, builder);
                 builder.Append("<#18A4A9>");
-                builder.Append($"{Short_Precision} ");
+                builder.Append($"{languageDatas.precision} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.PrecisionDamageMulti, 2));
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -296,7 +326,7 @@ namespace WeaponStatShower.Utils
 
             Divider(ref count, builder);
             builder.Append("<#6764de>");
-            builder.Append($"{Short_Falloff} ");
+            builder.Append($"{languageDatas.falloff} ");
             builder.Append(((int)archeTypeDataBlock.DamageFalloff.x).ToString() + "m");
             builder.Append(CLOSE_COLOR_TAG);
             count++;
@@ -307,7 +337,7 @@ namespace WeaponStatShower.Utils
             {
                 Divider(ref count, builder);
                 builder.Append("<color=green>");
-                builder.Append($"{Short_Stagger} ");
+                builder.Append($"{languageDatas.stagger} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.StaggerDamageMulti, 2));
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -319,7 +349,7 @@ namespace WeaponStatShower.Utils
             {
                 Divider(ref count, builder);
                 builder.Append("<#cc9347>");
-                builder.Append($"{Short_HipSpread} ");
+                builder.Append($"{languageDatas.hipSpread} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.HipFireSpread, 2));
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -331,7 +361,7 @@ namespace WeaponStatShower.Utils
             {
                 Divider(ref count, builder);
                 builder.Append("<#e6583c>");
-                builder.Append($"{Short_AimSpread} ");
+                builder.Append($"{languageDatas.aimDSpread} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.AimSpread, 2));
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -344,7 +374,7 @@ namespace WeaponStatShower.Utils
             {
                 Divider(ref count, builder);
                 builder.Append("<#097345>");
-                builder.Append($"{Short_PierceCount} ");
+                builder.Append($"{languageDatas.pierceCount} ");
                 builder.Append(archeTypeDataBlock.PiercingDamageCountLimit);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -359,6 +389,8 @@ namespace WeaponStatShower.Utils
 
         private string GetFormatedWeaponStats(MeleeArchetypeDataBlock archeTypeDataBlock, ItemDataBlock itemDataBlock)
         {
+            MeleeLanguageModel meleeLanguage = languageDatas.melee;
+
             if (archeTypeDataBlock == null) return string.Empty;
 
             StringBuilder builder = new StringBuilder();
@@ -375,14 +407,14 @@ namespace WeaponStatShower.Utils
             }
 
             builder.Append("<#9D2929>");
-            builder.Append($"{Short_Damage}{Short_MeleeLight} ");
+            builder.Append($"{languageDatas.damage}.{meleeLanguage.light} ");
             builder.Append(archeTypeDataBlock.LightAttackDamage);
             builder.Append(CLOSE_COLOR_TAG);
 
             builder.Append(DIVIDER);
 
             builder.Append("<color=orange>");
-            builder.Append($"{Short_Damage}{Short_MeleeCharged} ");
+            builder.Append($"{languageDatas.damage}.{meleeLanguage.heavy} ");
             builder.Append(archeTypeDataBlock.ChargedAttackDamage);
             builder.Append(CLOSE_COLOR_TAG);
 
@@ -393,7 +425,7 @@ namespace WeaponStatShower.Utils
                 builder.Append(DIVIDER);
 
                 builder.Append("<#FFD306>");
-                builder.Append($"{Short_MeleeCanRunWhileCharging} ");
+                builder.Append($"{meleeLanguage.canRunWhileCharging} ");
                 builder.Append(archeTypeDataBlock.AllowRunningWhenCharging);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -404,7 +436,7 @@ namespace WeaponStatShower.Utils
                 Divider(ref count, builder);
 
                 builder.Append("<#C0FF00>");
-                builder.Append($"{Short_Stagger}{Short_MeleeLight} ");
+                builder.Append($"{languageDatas.damage}.{meleeLanguage.light} ");
                 builder.Append(archeTypeDataBlock.LightStaggerMulti);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -415,7 +447,7 @@ namespace WeaponStatShower.Utils
                 Divider(ref count, builder);
 
                 builder.Append("<color=green>");
-                builder.Append($"{Short_Stagger}{Short_MeleeCharged} ");
+                builder.Append($"{languageDatas.stagger}.{meleeLanguage.heavy} ");
                 builder.Append(archeTypeDataBlock.ChargedStaggerMulti);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -426,7 +458,7 @@ namespace WeaponStatShower.Utils
                 Divider(ref count, builder);
 
                 builder.Append("<#004E2C>");
-                builder.Append($"{Short_Precision}{Short_MeleeLight} ");
+                builder.Append($"{languageDatas.precision}.{meleeLanguage.light} ");
                 builder.Append(archeTypeDataBlock.LightPrecisionMulti);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -437,7 +469,7 @@ namespace WeaponStatShower.Utils
                 Divider(ref count, builder);
 
                 builder.Append("<#55022B>");
-                builder.Append($"{Short_Precision}{Short_MeleeCharged} ");
+                builder.Append($"{languageDatas.precision}.{meleeLanguage.heavy} ");
                 builder.Append(archeTypeDataBlock.ChargedPrecisionMulti);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -448,7 +480,7 @@ namespace WeaponStatShower.Utils
                 Divider(ref count, builder);
 
                 builder.Append("<#A918A7>");
-                builder.Append($"{Short_MeleeSleepingEnemiesMultiplier}{Short_MeleeLight} ");
+                builder.Append($"{meleeLanguage.sleepingEnemiesMultiplier}.{meleeLanguage.light} ");
                 builder.Append(archeTypeDataBlock.LightSleeperMulti);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -459,7 +491,7 @@ namespace WeaponStatShower.Utils
                 Divider(ref count, builder);
 
                 builder.Append("<#025531>");
-                builder.Append($"{Short_MeleeSleepingEnemiesMultiplier}{Short_MeleeCharged} ");
+                builder.Append($"{meleeLanguage.sleepingEnemiesMultiplier}.{meleeLanguage.heavy} ");
                 builder.Append(archeTypeDataBlock.ChargedSleeperMulti);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -470,7 +502,7 @@ namespace WeaponStatShower.Utils
                 Divider(ref count, builder);
 
                 builder.Append("<#18A4A9>");
-                builder.Append($"{Short_EnvironmentMultiplier}{Short_MeleeLight} ");
+                builder.Append($"{meleeLanguage.environmentMultiplier}.{meleeLanguage.light} ");
                 builder.Append(archeTypeDataBlock.LightEnvironmentMulti);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -481,7 +513,7 @@ namespace WeaponStatShower.Utils
                 Divider(ref count, builder);
 
                 builder.Append("<#75A2AA>");
-                builder.Append($"{Short_EnvironmentMultiplier}{Short_MeleeCharged} ");
+                builder.Append($"{meleeLanguage.environmentMultiplier}.{meleeLanguage.heavy} ");
                 builder.Append(archeTypeDataBlock.ChargedEnvironmentMulti);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
@@ -567,18 +599,7 @@ namespace WeaponStatShower.Utils
             return FormatFloat(value, 1).ToString();
         }
 
-        internal void Inizialize(GearIDRange idRange, PlayerDataBlock playerDataBlock)
-        {
-            this.idRange = idRange;
 
-            _playerDataBlock = playerDataBlock;
-
-            categoryID = idRange.GetCompID(eGearComponent.Category);
-
-            gearCatBlock = GameDataBlockBase<GearCategoryDataBlock>.GetBlock(categoryID);
-
-            itemDataBlock = ItemDataBlock.GetBlock(gearCatBlock.BaseItem);
-        }
 
         private const string DIVIDER = " | ";
         private const string CLOSE_COLOR_TAG = "</color>";

@@ -1,10 +1,10 @@
 [
   {
     "firemode": {
-      "firemode_FullA": "Full-A",
-      "firemode_SemiA": "Semi-A",
-      "firemode_Burst": "Burst",
-      "firemode_Shotgun_Sentry": "Shotgun-S"
+      "fullA": "Full-A",
+      "semiA": "Semi-A",
+      "burst": "Burst",
+      "shotgunSentry": "Shotgun-S"
     },
 
     "melee": {
@@ -14,9 +14,9 @@
       "sleepingEnemiesMultiplier": "Slp",
       "environmentMultiplier": "Env",
       "canPierce": "Piercing",
-      "short_range": "Short Range",
-      "medium_range": "Medium Range",
-      "long_range": "Long Range",
+      "shortRange": "Short Range",
+      "mediumRange": "Medium Range",
+      "longRange": "Long Range",
       "hammer": "Hammer - Balanced",
       "knife": "Knife - Fast",
       "bat": "Bat - Fast",
@@ -35,10 +35,10 @@
       "striker": "STRK",
       "shooter": "SHTR",
       "scout": "SCOUT",
-      "big_striker": "B-STRK",
-      "big_shooter": "B-SHTR",
+      "bigStriker": "B-STRK",
+      "bigShooter": "B-SHTR",
       "charger": "CHRG",
-      "charger_scout": "C-SCOUT",
+      "chargerScout": "C-SCOUT",
       "occipit": "o",
       "head": "h",
       "back": "b",
@@ -56,15 +56,17 @@
     "rateOfFire": "RoF",
     "aimDSpread": "ADS",
     "hipSpread": "HIP",
-    "deployable": "Deployable"
+    "deployable": "Deployable",
+    "longChargeUp": "Long Charge-up",
+    "shortChargeUp": "short Charge-up"
   },
 
   {
     "firemode": {
-      "firemode_FullA": "全自动",
-      "firemode_SemiA": "半自动",
-      "firemode_Burst": "连发",
-      "firemode_Shotgun_Sentry": "半自动霰弹射击"
+      "fullA": "全自动",
+      "semiA": "半自动",
+      "burst": "连发",
+      "shotgunSentry": "半自动霰弹射击"
     },
 
     "melee": {
@@ -74,9 +76,9 @@
       "sleepingEnemiesMultiplier": "沉睡倍率",
       "environmentMultiplier": "环境倍率",
       "canPierce": "穿刺",
-      "short_range": "短距离",
-      "medium_range": "中距离",
-      "long_range": "长距离",
+      "shortRange": "短距离",
+      "mediumRange": "中距离",
+      "longRange": "长距离",
       "hammer": "大锤 - 均衡",
       "knife": "刀 - 快速",
       "bat": "棍棒 - 快速",
@@ -95,10 +97,10 @@
       "striker": "前锋",
       "shooter": "射手",
       "scout": "哨兵",
-      "big_striker": "大壮",
-      "big_shooter": "大姐",
+      "bigStriker": "大壮",
+      "bigShooter": "大姐",
       "charger": "黑刺",
-      "charger_scout": "黑触",
+      "chargerScout": "黑触",
       "occipit": "后脑]",
       "head": "头",
       "back": "背",
@@ -116,6 +118,8 @@
     "rateOfFire": "射速",
     "aimDSpread": "倍镜",
     "hipSpread": "后坐力",
-    "deployable": "可部署"
+    "deployable": "可部署",
+    "longChargeUp": "长蓄力",
+    "shortChargeUp": "短蓄力"
   }
 ]
