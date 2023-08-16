@@ -15,11 +15,10 @@ namespace WeaponStatShower.Patches
         public override string Name { get; } = PatchName;
 
         private static readonly ConfigDefinition ConfigEnabled = new(PatchName, "Enabled");
-        private static readonly ConfigDefinition Language = new(PatchName, "SleepersShown");
+        private static readonly ConfigDefinition Language = new(PatchName, "Language");
         private static readonly ConfigDefinition ConfigSleepers = new(PatchName, "SleepersShown");
 
-        private static LanguageEnum LanguageValue;
-        private static string? CurrShownSleepers;
+        private static LanguageEnum PrevLanguageEnum = LanguageEnum.English;
         private static string PrevShownSleepers = "PLACEHOLDER";
 
         private static WeaponDescriptionBuilder? _weaponDescriptionBuilder;
@@ -54,16 +53,17 @@ namespace WeaponStatShower.Patches
             }
 
             WeaponStatShowerPlugin.Instance.Config.Reload();
-            CurrShownSleepers = WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<string>(ConfigSleepers).Value.Trim().ToUpper();
-            LanguageValue = WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<LanguageEnum>(Language).Value;
+            string CurrShownSleepers = WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<string>(ConfigSleepers).Value.Trim().ToUpper();
+            LanguageEnum CurrLanguageValue = WeaponStatShowerPlugin.Instance.Config.GetConfigEntry<LanguageEnum>(Language).Value;
 
-            if (!PrevShownSleepers.Equals(CurrShownSleepers))
+            if (!PrevShownSleepers.Equals(CurrShownSleepers) || !CurrLanguageValue.Equals(PrevLanguageEnum))
             {
-                _weaponDescriptionBuilder.UpdateSleepersDatas(CurrShownSleepers.Split(','), LanguageValue);
+                _weaponDescriptionBuilder.UpdateSleepersDatas(CurrShownSleepers.Split(','), CurrLanguageValue);
                 PrevShownSleepers = CurrShownSleepers;
+                PrevLanguageEnum = CurrLanguageValue;
             }
 
-            _weaponDescriptionBuilder.Inizialize(idRange, PlayerDataBlock.GetBlock(1U), LanguageValue);
+            _weaponDescriptionBuilder.Inizialize(idRange, PlayerDataBlock.GetBlock(1U), CurrLanguageValue);
 
             __instance.GearDescription = _weaponDescriptionBuilder.DescriptionFormatter(__instance.GearDescription);
             __instance.GearPublicName = _weaponDescriptionBuilder.FireRateFormatter(__instance.GearPublicName);

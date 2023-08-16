@@ -1,6 +1,5 @@
 ﻿using GameData;
 using Gear;
-using Il2CppSystem.Resources;
 using Player;
 using System.Text;
 using System.Text.Json;
@@ -42,9 +41,7 @@ namespace WeaponStatShower.Utils
 
         private LanguageDatas desirializeLanguageJson(LanguageEnum language)
         {
-            string fileName = "./Language/LocalizatedStrings.json";
-            string jsonString = File.ReadAllText(fileName);
-            LanguageDatasClass languageStrings = JsonSerializer.Deserialize<LanguageDatasClass>(jsonString)!;
+            LanguageDatasClass languageStrings = JsonSerializer.Deserialize<LanguageDatasClass>(LocalizedString.JsonString)!;
             return language.Equals(LanguageEnum.English) ? languageStrings.english : languageStrings.chinese;
         }
 
@@ -261,11 +258,13 @@ namespace WeaponStatShower.Utils
         {
             if (archeTypeDataBlock == null) return string.Empty;
 
+            bool isChinese = !languageDatas.damage.Equals("Dmg");
+
             StringBuilder builder = new StringBuilder();
 
             void Divider(ref int count, StringBuilder builder)
             {
-                if (count >= 4)
+                if (count >= 4 || (isChinese && count >= 3))
                 {
                     builder.Append("\n");
                     count = 0;
@@ -304,8 +303,7 @@ namespace WeaponStatShower.Utils
 
             if (!isSentryGun)
             {
-                builder.Append(DIVIDER);
-
+                Divider(ref count, builder);
                 builder.Append("<#C0FF00>");
                 builder.Append($"{languageDatas.reload} ");
                 builder.Append(FormatFloat(archeTypeDataBlock.DefaultReloadTime, 2));
