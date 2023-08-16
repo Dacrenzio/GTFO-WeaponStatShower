@@ -17,7 +17,7 @@ namespace WeaponStatShower.Utils
         private uint categoryID;
         private GearCategoryDataBlock gearCatBlock;
         private ItemDataBlock itemDataBlock;
-        private LanguageDatasClass languageDatas;
+        private LanguageDatas languageDatas;
 
         internal void Inizialize(GearIDRange idRange, PlayerDataBlock playerDataBlock, LanguageEnum language)
         {
@@ -40,12 +40,12 @@ namespace WeaponStatShower.Utils
             sleepersDatas = new SleepersDatas(activatedSleepers, desirializeLanguageJson(language).sleepers);
         }
 
-        private LanguageDatasClass desirializeLanguageJson(LanguageEnum language)
+        private LanguageDatas desirializeLanguageJson(LanguageEnum language)
         {
             string fileName = "./Language/LocalizatedStrings.json";
             string jsonString = File.ReadAllText(fileName);
-            List<LanguageDatasClass> allObject = JsonSerializer.Deserialize<List<LanguageDatasClass>>(jsonString)!;
-            return language.Equals(LanguageEnum.English) ? allObject[0] : allObject[1]; ;
+            LanguageDatasClass languageStrings = JsonSerializer.Deserialize<LanguageDatasClass>(jsonString)!;
+            return language.Equals(LanguageEnum.English) ? languageStrings.english : languageStrings.chinese;
         }
 
 

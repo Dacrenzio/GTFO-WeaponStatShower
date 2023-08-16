@@ -1,5 +1,5 @@
-[
-  {
+{
+  "english": {
     "firemode": {
       "fullA": "Full-A",
       "semiA": "Semi-A",
@@ -8,8 +8,8 @@
     },
 
     "melee": {
-      "light": ".Lgt",
-      "heavy": ".Hvy",
+      "light": "Lgt",
+      "heavy": "Hvy",
       "canRunWhileCharging": "Run",
       "sleepingEnemiesMultiplier": "Slp",
       "environmentMultiplier": "Env",
@@ -61,7 +61,7 @@
     "shortChargeUp": "short Charge-up"
   },
 
-  {
+  "chinese": {
     "firemode": {
       "fullA": "全自动",
       "semiA": "半自动",
@@ -122,4 +122,4 @@
     "longChargeUp": "长蓄力",
     "shortChargeUp": "短蓄力"
   }
-]
+}
