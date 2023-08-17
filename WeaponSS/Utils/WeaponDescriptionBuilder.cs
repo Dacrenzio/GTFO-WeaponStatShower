@@ -420,11 +420,10 @@ namespace WeaponStatShower.Utils
 
             if (!archeTypeDataBlock.AllowRunningWhenCharging)
             {
-                builder.Append(DIVIDER);
+                Divider(ref count, builder);
 
                 builder.Append("<#FFD306>");
-                builder.Append($"{meleeLanguage.canRunWhileCharging} ");
-                builder.Append(archeTypeDataBlock.AllowRunningWhenCharging);
+                builder.Append($"{meleeLanguage.canRunWhileCharging}");
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;
             }
@@ -434,7 +433,7 @@ namespace WeaponStatShower.Utils
                 Divider(ref count, builder);
 
                 builder.Append("<#C0FF00>");
-                builder.Append($"{languageDatas.damage}.{meleeLanguage.light} ");
+                builder.Append($"{languageDatas.stagger}.{meleeLanguage.light} ");
                 builder.Append(archeTypeDataBlock.LightStaggerMulti);
                 builder.Append(CLOSE_COLOR_TAG);
                 count++;

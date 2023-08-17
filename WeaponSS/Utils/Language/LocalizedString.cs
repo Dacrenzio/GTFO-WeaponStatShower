@@ -13,7 +13,7 @@
 				""melee"": {
 					""light"": ""Lgt"",
 					""heavy"": ""Hvy"",
-					""canRunWhileCharging"": ""Run"",
+					""canRunWhileCharging"": ""Can't run"",
 					""sleepingEnemiesMultiplier"": ""Slp"",
 					""environmentMultiplier"": ""Env"",
 					""canPierce"": ""Piercing"",
@@ -71,8 +71,9 @@
 				""melee"": {
 					""light"": ""轻击"",
 					""heavy"": ""重击"",
-					""canRunWhileCharging"": ""冲刺"",
+					""canRunWhileCharging"": ""不能冲刺"",
 					""sleepingEnemiesMultiplier"": ""沉睡倍率"",
+					""environmentMultiplier"": ""环境倍率"",
 					""canPierce"": ""穿刺"",
 					""shortRange"": ""短距离"",
 					""mediumRange"": ""中距离"",
@@ -85,7 +86,7 @@
 				""spread"": {
 					""chocked"": ""收束扩散"",
 					""small"": ""扩散小"",
-					""medium"": ""扩散中"",
+					""medium"": ""中度扩散"",
 					""large"": ""扩散大"",
 					""huge"": ""超大扩散""
 				},
